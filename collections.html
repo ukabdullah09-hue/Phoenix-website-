@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collections — Phoenix Beds, Dewsbury</title>
+  <meta name="description" content="Browse Phoenix Beds' bespoke range of handcrafted ottoman beds, panel beds, divan sets and mattresses — all made to order in Dewsbury." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- PAGE LOADER -->
+  <div id="page-loader">
+    <img src="logo.jpg" alt="Phoenix Beds" class="loader-logo" />
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="site-nav scrolled" role="navigation" aria-label="Main navigation">
+    <a href="index.html" class="nav__logo" aria-label="Phoenix Beds home">
+      <img src="logo.jpg" alt="" class="nav__logo-img" />
+      <div class="nav__logo-text">
+        <span class="nav__logo-name">Phoenix Beds</span>
+        <span class="nav__logo-sub">Dewsbury, West Yorkshire</span>
+      </div>
+    </a>
+    <ul class="nav__links" role="list">
+      <li><a href="index.html" class="nav__link">Home</a></li>
+      <li><a href="collections.html" class="nav__link active">Collections</a></li>
+      <li><a href="contact.html" class="nav__link">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="nav__cta">Get a Quote</a>
+    <button class="nav__burger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE NAV -->
+  <div class="nav__mobile" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+    <a href="index.html" class="nav__link">Home</a>
+    <a href="collections.html" class="nav__link">Collections</a>
+    <a href="contact.html" class="nav__link">Contact</a>
+    <a href="contact.html" class="btn btn--fire" style="margin-top:1rem;"><span>Get a Quote</span></a>
+  </div>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="page-hero__glow" aria-hidden="true"></div>
+    <div class="container">
+      <div class="page-hero__inner">
+        <p class="eyebrow" data-reveal>Everything We Make</p>
+        <div class="divider divider--left" style="margin-top:0.75rem;" aria-hidden="true"></div>
+        <h1 class="page-hero__headline" data-reveal data-delay="80">
+          The Phoenix<br>Collections
+        </h1>
+        <p class="page-hero__sub" data-reveal data-delay="160">
+          Every product on this page is manufactured by us at our Dewsbury facility.
+          All sizes, fabrics and finishes can be specified to your requirements.
+          Prices shown on enquiry — we build to order.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <section style="background:var(--black);padding:clamp(3rem,6vw,6rem) 0;">
+    <div class="container">
+
+      <!-- Filters -->
+      <div class="product-filters" role="group" aria-label="Filter products">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="ottoman">Ottoman Beds</button>
+        <button class="filter-btn" data-filter="panel">Panel Beds</button>
+        <button class="filter-btn" data-filter="divan">Divan Sets</button>
+        <button class="filter-btn" data-filter="mattress">Mattresses</button>
+      </div>
+
+      <!-- Grid -->
+      <div class="products-grid">
+
+        <!-- Ottoman 1 -->
+        <div class="product-card" data-category="ottoman" data-reveal>
+          <div class="product-card__img-wrap">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a1a1a,#2d1a0a,#1a0d0d);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:3.5rem;opacity:0.2;" aria-hidden="true">🛏</span>
+            </div>
+            <span class="product-card__badge">Bestseller</span>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Ottoman Bed</p>
+            <h2 class="product-card__name">Continental Ottoman</h2>
+            <p class="product-card__desc">End-opening hydraulic ottoman with smooth-lift mechanism. Available in velvet, linen or faux-leather. Bespoke sizing available.</p>
+            <div class="product-card__footer">
+              <div>
+                <p class="product-card__price">Price on Enquiry</p>
+                <p class="product-card__price-note">All sizes · Multiple fabrics</p>
+              </div>
+              <a href="contact.html" class="btn btn--fire" style="padding:0.65rem 1.2rem;font-size:0.72rem;"><span>Enquire</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ottoman 2 -->
+        <div class="product-card" data-category="ottoman" data-reveal data-delay="80">
+          <div class="product-card__img-wrap">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#161616,#261810,#161616);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:3.5rem;opacity:0.2;" aria-hidden="true">🛏</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Ottoman Bed</p>
+            <h2 class="product-card__name">Side-Opening Ottoman</h2>
+            <p class="product-card__desc">Side-lift gas-piston ottoman frame — ideal where the foot of the bed is against a wall. Built to your chosen size and upholstery.</p>
+            <div class="product-card__footer">
+              <div>
+                <p class="product-card__price">Price on Enquiry</p>
+                <p class="product-card__price-note">Made to order</p>
+              </div>
+              <a href="contact.html" class="btn btn--fire" style="padding:0.65rem 1.2rem;font-size:0.72rem;"><span>Enquire</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 1 -->
+        <div class="product-card" data-category="panel" data-reveal data-delay="160">
+          <div class="product-card__img-wrap">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#181818,#24190c,#181818);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:3.5rem;opacity:0.2;" aria-hidden="true">🛏</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Panel Bed</p>
+            <h2 class="product-card__name">High-Panel Wing Bed</h2>
+            <p class="product-card__desc">Floor-to-ceiling panel headboard with wide sculpted wings. A statement centrepiece in any bedroom. Custom upholstery throughout.</p>
+            <div class="product-card__footer">
+              <div>
+                <p class="product-card__price">Price on Enquiry</p>
+                <p class="product-card__price-note">All sizes available</p>
+              </div>
+              <a href="contact.html" class="btn btn--fire" style="padding:0.65rem 1.2rem;font-size:0.72rem;"><span>Enquire</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2 -->
+        <div class="product-card" data-category="panel" data-reveal>
+          <div class="product-card__img-wrap">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#141414,#1e160c,#141414);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:3.5rem;opacity:0.2;" aria-hidden="true">🛏</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Panel Bed</p>
+            <h2 class="product-card__name">Buttoned Chesterfield</h2>
+            <p class="product-card__desc">Deep-buttoned diamond headboard in luxury velvet. Classic British craftsmanship with a contemporary silhouette. Custom depth available.</p>
+            <div class="product-card__footer">
+              <div>
+                <p class="product-card__price">Price on Enquiry</p>
+                <p class="product-card__price-note">Velvet · Faux leather · Linen</p>
+              </div>
+              <a href="contact.html" class="btn btn--fire" style="padding:0.65rem 1.2rem;font-size:0.72rem;"><span>Enquire</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divan -->
+        <div class="product-card" data-category="divan" data-reveal data-delay="80">
+          <div class="product-card__img-wrap">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#121212,#1c1208,#121212);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:3.5rem;opacity:0.2;" aria-hidden="true">🛏</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Divan Set</p>
+            <h2 class="product-card__name">Platform Divan</h2>
+            <p class="product-card__desc">Solid platform-top divan base with optional drawer storage. Paired with your choice of our mattress range. Any size to order.</p>
+            <div class="product-card__footer">
+              <div>
+                <p class="product-card__price">Price on Enquiry</p>
+                <p class="product-card__price-note">Base + mattress options</p>
+              </div>
+              <a href="contact.html" class="btn btn--fire" style="padding:0.65rem 1.2rem;font-size:0.72rem;"><span>Enquire</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mattress 1 -->
+        <div class="product-card" data-category="mattress" data-reveal data-delay="160">
+          <div class="product-card__img-wrap">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#111,#1b1209,#111);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:3.5rem;opacity:0.2;" aria-hidden="true">💤</span>
+            </div>
+            <span class="product-card__badge">Popular</span>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Mattress</p>
+            <h2 class="product-card__name">Pocket Spring</h2>
+            <p class="product-card__desc">Individually pocketed springs with comfort layers in memory foam or natural fillings. Available in medium, firm or ortho tension.</p>
+            <div class="product-card__footer">
+              <div>
+                <p class="product-card__price">Price on Enquiry</p>
+                <p class="product-card__price-note">All UK sizes · Bespoke available</p>
+              </div>
+              <a href="contact.html" class="btn btn--fire" style="padding:0.65rem 1.2rem;font-size:0.72rem;"><span>Enquire</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mattress 2 -->
+        <div class="product-card" data-category="mattress" data-reveal>
+          <div class="product-card__img-wrap">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#0f0f0f,#1a1108,#0f0f0f);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:3.5rem;opacity:0.2;" aria-hidden="true">💤</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Mattress</p>
+            <h2 class="product-card__name">Memory Foam</h2>
+            <p class="product-card__desc">High-density viscoelastic memory foam mattress with cooling gel layer and breathable cover. Ideal for pressure-point relief.</p>
+            <div class="product-card__footer">
+              <div>
+                <p class="product-card__price">Price on Enquiry</p>
+                <p class="product-card__price-note">Medium · Firm tension</p>
+              </div>
+              <a href="contact.html" class="btn btn--fire" style="padding:0.65rem 1.2rem;font-size:0.72rem;"><span>Enquire</span></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mattress 3 -->
+        <div class="product-card" data-category="mattress" data-reveal data-delay="80">
+          <div class="product-card__img-wrap">
+            <div style="width:100%;height:100%;background:linear-gradient(135deg,#0d0d0d,#171009,#0d0d0d);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:3.5rem;opacity:0.2;" aria-hidden="true">💤</span>
+            </div>
+          </div>
+          <div class="product-card__body">
+            <p class="product-card__category">Mattress</p>
+            <h2 class="product-card__name">Open Coil</h2>
+            <p class="product-card__desc">Traditional open-coil spring construction, reliable and cost-effective. Available in multiple tensions. Bespoke sizing on request.</p>
+            <div class="product-card__footer">
+              <div>
+                <p class="product-card__price">Price on Enquiry</p>
+                <p class="product-card__price-note">Budget to premium spec</p>
+              </div>
+              <a href="contact.html" class="btn btn--fire" style="padding:0.65rem 1.2rem;font-size:0.72rem;"><span>Enquire</span></a>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /products-grid -->
+
+      <!-- Notice -->
+      <div class="notice" style="margin-top:3rem;" data-reveal>
+        <strong>Note to Usman:</strong> Product names, descriptions and categories are placeholders based on typical bespoke bed manufacturer ranges. Please supply your actual product names, descriptions and any photography so we can update these cards accurately.
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BESPOKE CTA -->
+  <section class="cta-band">
+    <div class="cta-band__glow" aria-hidden="true"></div>
+    <div class="container--narrow">
+      <p class="cta-band__pre">Don't see what you need?</p>
+      <h2 class="cta-band__headline">
+        We Build<br>Anything Bespoke
+      </h2>
+      <p class="cta-band__sub">
+        Non-standard sizes, unusual dimensions, custom fabrics — if you can describe it, we can build it. Speak to us directly.
+      </p>
+      <div class="cta-band__actions">
+        <a href="contact.html" class="btn btn--fire"><span>Get a Bespoke Quote</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-brand__logo">
+            <img src="logo.jpg" alt="Phoenix Beds" class="footer-brand__logo-img" />
+            <span class="footer-brand__logo-name">Phoenix Beds</span>
+          </div>
+          <p class="footer-brand__tagline">"We Care For Your Sleep."</p>
+          <p style="font-size:0.82rem;color:var(--silver-dk);max-width:26ch;line-height:1.6;">
+            Bespoke beds and mattresses, manufactured in-house at our Dewsbury facility.
+          </p>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col__heading">Navigate</p>
+          <ul class="footer-col__links" role="list">
+            <li><a href="index.html" class="footer-col__link">Home</a></li>
+            <li><a href="collections.html" class="footer-col__link">Collections</a></li>
+            <li><a href="contact.html" class="footer-col__link">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col__heading">Products</p>
+          <ul class="footer-col__links" role="list">
+            <li><a href="collections.html" class="footer-col__link">Ottoman Beds</a></li>
+            <li><a href="collections.html" class="footer-col__link">Panel Beds</a></li>
+            <li><a href="collections.html" class="footer-col__link">Mattresses</a></li>
+            <li><a href="collections.html" class="footer-col__link">Bespoke Orders</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col__heading">Contact</p>
+          <ul class="footer-col__links" role="list">
+            <li class="footer-col__link" style="color:var(--silver-dk);">Dewsbury, West Yorkshire</li>
+            <li><a href="contact.html" class="footer-col__link">Send an Enquiry</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-bottom__copy">&copy; 2025 Phoenix Beds UK. All rights reserved.</p>
+        <nav class="footer-bottom__links" aria-label="Legal">
+          <a href="#" class="footer-bottom__link">Privacy Policy</a>
+          <a href="#" class="footer-bottom__link">Terms</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
