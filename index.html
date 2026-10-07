@@ -11,6 +11,12 @@
 </head>
 <body>
 
+  <!-- ── PAGE LOADER ── -->
+  <div id="page-loader">
+    <img src="logo.jpg" alt="Phoenix Beds" class="loader-logo" />
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+
   <!-- ── ANNOUNCEMENT BAR ── -->
   <div class="announcement-bar">
     ✨ Free UK Delivery on All Orders &nbsp;·&nbsp; 100-Night Sleep Trial &nbsp;·&nbsp; 10-Year Guarantee
@@ -55,7 +61,9 @@
   <!-- ── HERO ── -->
   <section class="hero">
     <div class="hero__bg"></div>
+    <canvas id="hero-canvas"></canvas>
     <div class="hero__overlay"></div>
+    <div class="hero__scanline"></div>
     <div class="container hero__content">
       <div class="hero__logo-large">
         <img src="logo.jpg" alt="Phoenix Beds" />
@@ -79,7 +87,7 @@
 
   <!-- ── PROOF BAR ── -->
   <section class="proof-bar">
-    <div class="container proof-bar__inner">
+    <div class="container proof-bar__inner reveal-stagger">
       <div class="proof-item">
         <strong>50,000+</strong>
         <span>Happy Customers</span>
@@ -110,7 +118,7 @@
         <h2 class="section-title">Premium Sleep Starts Here</h2>
         <p class="section-sub">Every mattress handpicked for comfort, support, and durability — at a price that won't keep you up at night.</p>
       </div>
-      <div class="products__grid">
+      <div class="products__grid reveal-stagger">
 
         <div class="product-card product-card--featured">
           <div class="product-card__badge">Best Seller</div>
@@ -253,7 +261,7 @@
         <h2 class="section-title">Beautiful Bed Frames</h2>
         <p class="section-sub">Complete your bedroom with our stunning range of premium bed frames.</p>
       </div>
-      <div class="beds-grid">
+      <div class="beds-grid reveal-stagger">
         <div class="bed-card">
           <div class="bed-card__img bed-card__img--1">
             <span class="bed-emoji">🛏️</span>
@@ -362,7 +370,7 @@
         <h2 class="section-title">Thousands of Happy Sleepers</h2>
         <p class="section-sub">Real reviews from real customers — all verified buyers.</p>
       </div>
-      <div class="reviews-grid">
+      <div class="reviews-grid reveal-stagger">
         <div class="review-card">
           <div class="review-stars">★★★★★</div>
           <p class="review-text">"Absolutely the best mattress I've ever slept on. My back pain has completely gone after just two weeks. The delivery was fast and the service was brilliant. Highly recommend Phoenix Beds to everyone!"</p>
@@ -517,7 +525,7 @@
         <h2 class="section-title">We're Here to Help</h2>
         <p class="section-sub">Our sleep experts are available 7 days a week.</p>
       </div>
-      <div class="contact-cards">
+      <div class="contact-cards reveal-stagger">
         <div class="contact-card">
           <span class="contact-icon">📞</span>
           <h3>Call Us</h3>
