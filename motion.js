@@ -143,7 +143,9 @@ window.Motion = (() => {
       const r = t.getBoundingClientRect();
       const amt = r.width > 400 ? 0.985 : r.width > 160 ? 0.96 : 0.9;
       springRelease(t);
-      const tipped = e.pointerType !== 'mouse' && t.matches(TIP);
+      // Most loved cards press with a plain, quick ease: no tilt, no elastic bounce
+      const railCard = !!t.closest('.rail');
+      const tipped = e.pointerType !== 'mouse' && t.matches(TIP) && !railCard;
       let press = { scale: amt };
       if (t.matches(SQUISH)) {
         press = { scaleX: 1 + (1 - amt) * 0.35, scaleY: 1 - (1 - amt) * 1.1 };
@@ -161,7 +163,7 @@ window.Motion = (() => {
         t.classList.remove('is-pressed');
         const back = { scaleX: 1, scaleY: 1, rotation: 0, duration: 0.9, ease: 'elastic.out(1.1, 0.32)', overwrite: 'auto' };
         if (tipped) Object.assign(back, { rotationX: 0, rotationY: 0, ease: 'elastic.out(1, 0.42)' });
-        if (cancelled) Object.assign(back, { duration: 0.3, ease: 'power3.out' });
+        if (cancelled || railCard) Object.assign(back, { duration: 0.35, ease: 'power3.out' });
         g.to(t, back);
       };
       const up = () => release(false);
@@ -354,7 +356,7 @@ window.Motion = (() => {
     });
 
     root.querySelectorAll('.rail').forEach((rail) => {
-      g.from(rail.children, { x: 80, opacity: 0, duration: 0.8, ease: 'power3.out', stagger: 0.06, clearProps: 'transform,opacity', scrollTrigger: { trigger: rail, start: 'top 88%', once: true } });
+      g.from(rail.children, { y: 28, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, clearProps: 'transform,opacity', scrollTrigger: { trigger: rail, start: 'top 88%', once: true } });
       drag(rail);
     });
 
@@ -482,7 +484,7 @@ window.Motion = (() => {
     }
     lastY = window.scrollY;
     railPos.clear();
-    root.querySelectorAll(SPRING).forEach((el) => springIO.observe(el));
+    root.querySelectorAll(SPRING).forEach((el) => { if (!el.closest('.rail')) springIO.observe(el); });
   }
 
   function springReset() {
