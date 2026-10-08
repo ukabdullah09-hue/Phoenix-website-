@@ -45,7 +45,7 @@
 
   function card(p) {
     return `<article class="card">
-      <div class="card__img"><img src="${PHOTO}" alt="${ALT}">${p.stock ? '' : '<span class="tag-oos">Out of stock</span>'}</div>
+      <div class="card__img"><img src="${PHOTO}" alt="${ALT}" loading="lazy" decoding="async">${p.stock ? '' : '<span class="tag-oos">Out of stock</span>'}</div>
       ${heartBtn(p)}
       <div class="card__body"><span class="card__cat">${esc(cat(p.cat).name || '')}</span><a class="card__name" href="#bed-${p.id}">${esc(p.name)} Bed</a>${rating(p)}<span class="card__price">From ${money(p.min)}</span></div>
     </article>`;
@@ -54,7 +54,7 @@
   function compactCard(p, hidden) {
     const src = S.SOURCES[p.src].name;
     return `<article class="card card--compact${hidden ? ' is-hidden' : ''}" data-id="${p.id}" data-cat="${p.cat}" data-min="${p.min}" data-pop="${pop(p)}">
-      <div class="card__img"><img src="${PHOTO}" alt="${ALT}">${p.stock ? '' : '<span class="tag-oos">Out of stock</span>'}</div>
+      <div class="card__img"><img src="${PHOTO}" alt="${ALT}" loading="lazy" decoding="async">${p.stock ? '' : '<span class="tag-oos">Out of stock</span>'}</div>
       ${heartBtn(p)}
       <div class="card__body">
         <a class="card__name" href="#bed-${p.id}">${esc(p.name)} Bed</a>
@@ -106,7 +106,7 @@
     ['Can I return a bed?', 'Beds made to custom dimensions can\'t be returned, so please double-check your measurements. Our full returns policy is to be supplied.']
   ];
   function reviewCards(list) {
-    return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review"><span class="stars" aria-label="${r.stars} out of 5 stars">${'★'.repeat(r.stars)}</span><blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.date ? ` · ${r.date}` : ''}<br>Review left on ${S.SOURCES[r.src].name}</footer></figure>`).join('')}</div>`;
+    return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review"><span class="stars" data-stars role="img" aria-label="${r.stars} out of 5 stars">${'<span class="star" aria-hidden="true">★</span>'.repeat(r.stars)}</span><blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.date ? ` · ${r.date}` : ''}<br>Review left on ${S.SOURCES[r.src].name}</footer></figure>`).join('')}</div>`;
   }
   const scores = () => `<div class="scores" data-stagger>${Object.values(S.SOURCES).map((s) => `<div class="score"><b data-count-to="${s.rating}">${s.rating.toFixed(1)}</b>${stars(5)}<span class="muted">Average rating on ${s.name}</span></div>`).join('')}</div>`;
 
@@ -128,12 +128,12 @@
         <h1 id="hero-t" data-hero-title>Beds made to order in Dewsbury.</h1>
         <p class="sub" data-hero-after>Your size. Your fabric. Your colour.</p>
         <span class="hero-pill" data-hero-after>From £240 · Handmade in Dewsbury</span>
-        <div class="actions" data-hero-after><a class="btn btn--fill" href="#shop"><span class="lbl">Shop all beds</span></a><a class="btn btn--line" href="#finder"><span class="lbl">Find my bed</span></a></div>
+        <div class="actions" data-hero-after><a class="btn btn--fill btn--glint" href="#shop"><span class="lbl">Shop all beds</span></a><a class="btn btn--line" href="#finder"><span class="lbl">Find my bed</span></a></div>
       </section>
 
       <section class="zoom" aria-label="Featured beds">
-        <div class="zoom-track" id="zoom-track">${SLIDES.map((s, i) => `<div class="zoom-slide"><figure class="zoom__frame"><img src="${PHOTO}" alt="${ALT}" style="object-position:${s.pos}"></figure><div class="zoom__cap"><h2>${s.h2}</h2><p>${s.sub}</p><a class="btn btn--fill" href="#bed-${s.id}"><span class="lbl">Shop ${s.h2.replace(' Bed.','')}</span></a></div></div>`).join('')}</div>
-        <div class="zoom-dots" id="zoom-dots" role="group" aria-label="Featured beds">${SLIDES.map((s,i)=>`<button class="zoom-dot" type="button" aria-label="${s.h2.replace('.','')} — slide ${i+1}" aria-selected="${i===0}"></button>`).join('')}</div>
+        <div class="zoom-track" id="zoom-track">${SLIDES.map((s, i) => `<div class="zoom-slide"><figure class="zoom__frame"><img src="${PHOTO}" alt="${ALT}" style="object-position:${s.pos}"${i === 0 ? ' fetchpriority="high"' : ''}></figure><div class="zoom__cap"><h2>${s.h2}</h2><p>${s.sub}</p><div class="zoom__go"><a class="btn btn--fill" href="#bed-${s.id}"><span class="lbl">Shop ${s.h2.replace(' Bed.','')}</span></a></div></div></div>`).join('')}</div>
+        <div class="zoom-dots" id="zoom-dots" role="group" aria-label="Featured beds">${SLIDES.map((s,i)=>`<button class="zoom-dot" type="button" aria-label="${s.h2.replace('.','')} — slide ${i+1}" aria-current="${i===0}"><i aria-hidden="true"></i></button>`).join('')}</div>
         <button class="zoom-arrow zoom-arrow--prev" type="button" aria-label="Previous bed" id="zoom-prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button class="zoom-arrow zoom-arrow--next" type="button" aria-label="Next bed" id="zoom-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
       </section>
@@ -148,7 +148,7 @@
       <section class="section" style="padding-top:0" aria-labelledby="cats-t">
         <div class="wrap">
           <div class="head head--center"><h2 id="cats-t" data-brighten>Find your kind of bed.</h2><p>Every bed is made to order in the fabric and colour you choose.</p></div>
-          <div class="cats" data-stagger>${shown.map((id) => { const c = cat(id); return `<a class="cat" href="#shop-${id}"><div class="cat__img"><img src="${PHOTO}" alt=""></div><div class="cat__body"><h3>${c.short || c.name}</h3><p>${c.line}</p><span class="go">Shop</span></div></a>`; }).join('')}</div>
+          <div class="cats">${shown.map((id) => { const c = cat(id); return `<a class="cat" href="#shop-${id}"><div class="cat__img"><img src="${PHOTO}" alt="" loading="lazy" decoding="async"></div><div class="cat__body"><h3>${c.short || c.name}</h3><p>${c.line}</p><span class="go">Shop</span></div></a>`; }).join('')}</div>
         </div>
       </section>
 
@@ -162,7 +162,7 @@
 
       <section class="story" aria-labelledby="story-t">
         <div class="story__inner">
-          <div class="story__media"><img src="${PHOTO}" alt="${ALT}"><img src="${PHOTO}" alt="" style="object-position:30% 30%"><img src="${PHOTO}" alt="" style="object-position:60% 80%"></div>
+          <div class="story__media"><img src="${PHOTO}" alt="${ALT}" loading="lazy" decoding="async"><img src="${PHOTO}" alt="" style="object-position:30% 30%" loading="lazy" decoding="async"><img src="${PHOTO}" alt="" style="object-position:60% 80%" loading="lazy" decoding="async"></div>
           <div class="story__steps">
             <div class="story__step"><span>01 / 03</span><h2 id="story-t">It starts as timber.</h2><p>Every frame is cut and built on our own workshop floor in Dewsbury.</p></div>
             <div class="story__step"><span>02 / 03</span><h2>Then it's upholstered by hand.</h2><p>Your fabric and colour, stitched and fitted by our team.</p></div>
@@ -187,7 +187,7 @@
       <section class="tile tile--mist" aria-labelledby="finder-t" style="padding-bottom:clamp(3rem,7vw,5rem)">
         <h2 id="finder-t" data-brighten>Your bed in three questions.</h2>
         <p class="sub">Size, storage and style. We'll pick the beds that fit.</p>
-        <div class="actions"><a class="btn btn--fill" href="#finder"><span class="lbl">Start the bed finder</span></a></div>
+        <div class="actions"><a class="btn btn--fill btn--glint" href="#finder"><span class="lbl">Start the bed finder</span></a></div>
       </section>
 
       <section class=”section” aria-labelledby=”homes-t”>
@@ -208,26 +208,6 @@
           place();
           M.slideIn(document.getElementById(p), t === 'tb-matt' ? 1 : -1);
         }));
-
-        // Hero carousel
-        const track = document.getElementById('zoom-track');
-        const dotsEl = document.getElementById('zoom-dots');
-        if (!track || !dotsEl) return;
-        const slides = [...track.children];
-        const dots = [...dotsEl.children];
-        const slideTo = (i) => track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
-        const curIdx = () => Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
-        const syncDots = () => { const i = curIdx(); dots.forEach((d, j) => d.setAttribute('aria-selected', j === i)); };
-        let scrollEndT = 0;
-        track.addEventListener('scroll', () => { clearTimeout(scrollEndT); scrollEndT = setTimeout(syncDots, 80); }, { passive: true });
-        dots.forEach((d, i) => d.addEventListener('click', () => { M.pressFx(d); slideTo(i); }));
-        document.getElementById('zoom-prev')?.addEventListener('click', (e) => { M.pressFx(e.currentTarget); slideTo(Math.max(0, curIdx() - 1)); });
-        document.getElementById('zoom-next')?.addEventListener('click', (e) => { M.pressFx(e.currentTarget); slideTo(Math.min(slides.length - 1, curIdx() + 1)); });
-        // Auto-advance every 6s; pause on touch
-        let autoT = setInterval(() => slideTo((curIdx() + 1) % slides.length), 6000);
-        const pauseAuto = () => { clearInterval(autoT); autoT = setInterval(() => slideTo((curIdx() + 1) % slides.length), 6000); };
-        track.addEventListener('touchstart', pauseAuto, { passive: true });
-        track.addEventListener('mousedown', pauseAuto, { passive: true });
       }
     };
   }
@@ -533,7 +513,7 @@
         <div class="head"><h1 class="page-h1" ${calm ? '' : 'data-hero-title'}>Your basket.</h1><p ${calm ? '' : 'data-hero-after'}>Pay a small deposit today and the rest on delivery.</p></div>
         <div class="bag"><div ${calm ? '' : 'data-stagger'}>${basket.map((item, i) => {
           const p = S.product(item.id);
-          return `<article class="bag-item" data-i="${i}"><img src="${PHOTO}" alt="${ALT}"><div><h3>${esc(p.name)} Bed</h3><ul>${describe(item).map((l) => `<li>${esc(l)}</li>`).join('')}</ul></div>
+          return `<article class="bag-item" data-i="${i}"><img src="${PHOTO}" alt="${ALT}" loading="lazy" decoding="async"><div><h3>${esc(p.name)} Bed</h3><ul>${describe(item).map((l) => `<li>${esc(l)}</li>`).join('')}</ul></div>
             <div class="bag-item__foot"><div class="qty" role="group" aria-label="Quantity for ${esc(p.name)}"><button type="button" data-q="${i}" data-d="-1" aria-label="One fewer">−</button><output aria-live="polite">${item.qty}</output><button type="button" data-q="${i}" data-d="1" aria-label="One more">+</button></div><b class="line-price">${money(item.unit * item.qty)}</b><button class="linkbtn" type="button" data-rm="${i}">Remove</button></div></article>`;
         }).join('')}</div>
         <aside class="panel summary" aria-labelledby="bs-t"><h2 id="bs-t">Order summary</h2><div id="bag-totals">${totalsHTML()}</div><a class="btn btn--fill btn--wide" href="#checkout"><span class="lbl">Check out</span></a><p class="note">Questions? <button class="linkbtn" type="button" data-wa>WhatsApp us</button>.</p></aside></div>

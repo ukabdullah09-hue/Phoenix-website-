@@ -6,11 +6,17 @@ window.Motion = (() => {
   const ST = window.ScrollTrigger;
   const FL = window.Flip;
   const on = !!(g && ST) && !reduce;
-  if (on) { g.registerPlugin(ST); if (FL) g.registerPlugin(FL); }
+  if (on) {
+    g.registerPlugin(ST); if (FL) g.registerPlugin(FL);
+    // Phone address bars grow and shrink while scrolling; recalculating every trigger on that resize causes jumps
+    ST.config({ ignoreMobileResize: true });
+  }
 
   const fmtMoney = (n) => '£' + Math.round(n).toLocaleString('en-GB');
   const escText = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   let heroDelay = 0;
+  const cleanups = [];
+  const buzz = (ms) => { if (!fine && navigator.vibrate) navigator.vibrate(ms); };
 
   function splitWords(el) {
     if (el.dataset.split === 'done') return el.querySelectorAll('.w');
@@ -123,6 +129,10 @@ window.Motion = (() => {
     burst(r.left + r.width / 2, r.top + r.height / 2, opts);
   }
 
+  /* Buttons squash like jelly; cards pressed by a finger tip toward it, then spring back */
+  const SQUISH = '.btn, .zoom-arrow, .zoom-dot, .wa, .heart, .qty button, .seg button, .chips a, .bag-link, .finder-opt';
+  const TIP = '.cat, .card, .strip__thumb';
+
   function pressFx() {
     document.addEventListener('pointerdown', (e) => {
       if (e.button > 0) return;
@@ -133,11 +143,26 @@ window.Motion = (() => {
       if (!on) return;
       const t = pressTarget(el);
       if (!t || getComputedStyle(t).display === 'inline') return;
-      const w = t.offsetWidth;
-      const amt = w > 400 ? 0.985 : w > 160 ? 0.96 : 0.9;
-      g.to(t, { scale: amt, duration: 0.12, ease: 'power2.out', overwrite: 'auto' });
+      const r = t.getBoundingClientRect();
+      const amt = r.width > 400 ? 0.985 : r.width > 160 ? 0.96 : 0.9;
+      springRelease(t);
+      const tipped = e.pointerType !== 'mouse' && t.matches(TIP);
+      let press = { scale: amt };
+      if (t.matches(SQUISH)) {
+        press = { scaleX: 1 - (1 - amt) * 0.55, scaleY: 1 - (1 - amt) * 1.35 };
+      } else if (tipped) {
+        const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        t.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
+        t.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+        press = { scale: amt, rotationY: (px - 0.5) * 13, rotationX: (0.5 - py) * 10, transformPerspective: 700 };
+      }
+      t.classList.add('is-pressed');
+      g.to(t, Object.assign(press, { duration: 0.14, ease: 'power2.out', overwrite: 'auto' }));
       const release = () => {
-        g.to(t, { scale: 1, duration: 0.75, ease: 'elastic.out(1, 0.38)', overwrite: 'auto' });
+        t.classList.remove('is-pressed');
+        const back = { scaleX: 1, scaleY: 1, rotation: 0, duration: 0.9, ease: 'elastic.out(1.1, 0.32)', overwrite: 'auto' };
+        if (tipped) Object.assign(back, { rotationX: 0, rotationY: 0, ease: 'elastic.out(1, 0.42)' });
+        g.to(t, back);
         window.removeEventListener('pointerup', release);
         window.removeEventListener('pointercancel', release);
       };
@@ -178,6 +203,8 @@ window.Motion = (() => {
 
   /* ── Page-level scroll animation ── */
   function reset() {
+    while (cleanups.length) cleanups.pop()();
+    springReset();
     if (!on) return;
     ST.getAll().forEach((t) => t.kill(true));
   }
@@ -185,8 +212,11 @@ window.Motion = (() => {
   function page(root, first) {
     buttons(document);
     faq(root);
+    carousel(root.querySelector('.zoom'));
     if (!on) { morphCancel(); return; }
     const d0 = first ? heroDelay : 0;
+    springObserve(root);
+    shimmer(root);
 
     const heroTitle = root.querySelector('[data-hero-title]');
     if (heroTitle) {
@@ -200,19 +230,67 @@ window.Motion = (() => {
 
     const zoom = root.querySelector('.zoom');
     if (zoom) {
-      const frame = zoom.querySelector('.zoom__frame');
-      const img = frame.querySelector('img');
+      // The carousel clips its whole track so every slide shares the reveal; the story page has a single frame
+      const track = zoom.querySelector('.zoom-track');
+      const frame = track || zoom.querySelector('.zoom__frame');
+      const imgs = zoom.querySelectorAll('.zoom__frame img');
       const cap = zoom.querySelector('.zoom__cap');
       const inset = window.innerWidth < 700 ? '6% 5% 6% 5%' : '10% 16% 10% 16%';
-      g.fromTo(img, { filter: 'blur(14px)' }, { filter: 'blur(0px)', duration: 1.4, ease: 'power2.out', delay: d0 });
-      g.set(cap, { opacity: 0, y: 30 });
+      // A full-screen blur costs phones a lot of frames; they get a plain fade instead
+      if (fine) g.fromTo(imgs[0], { filter: 'blur(14px)' }, { filter: 'blur(0px)', duration: 1.4, ease: 'power2.out', delay: d0, clearProps: 'filter' });
+      else g.from(imgs[0], { opacity: 0, duration: 1, ease: 'power2.out', delay: d0, clearProps: 'opacity' });
+      if (track) g.set(zoom, { '--cap': 0 }); else g.set(cap, { opacity: 0, y: 30 });
       const tl = g.timeline({ scrollTrigger: { trigger: zoom, start: 'top top', end: '+=80%', scrub: 0.6, pin: true, anticipatePin: 1 } });
       tl.fromTo(frame, { clipPath: `inset(${inset} round 28px)` }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none', duration: 1 })
-        .fromTo(img, { scale: 1.22 }, { scale: 1, ease: 'none', duration: 1 }, 0)
-        .to(cap, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, 0.65);
+        .fromTo(imgs, { scale: 1.22 }, { scale: 1, ease: 'none', duration: 1 }, 0);
+      if (track) tl.to(zoom, { '--cap': 1, duration: 0.35, ease: 'power2.out' }, 0.65);
+      else tl.to(cap, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, 0.65);
       const introEl = root.querySelector('.hero-intro');
       if (introEl) g.to(introEl, { opacity: 0, y: -60, ease: 'none', scrollTrigger: { trigger: zoom, start: 'top 55%', end: 'top top', scrub: true } });
     }
+
+    // Category tiles: each rises, then its photo wipes up from the bottom while the picture settles inside
+    const cats = [...root.querySelectorAll('.cats > .cat')];
+    if (cats.length) {
+      const parts = (t) => [t.querySelector('.cat__img'), t.querySelector('.cat__img img'), t.querySelectorAll('.cat__body > *')];
+      cats.forEach((t) => {
+        const [box, pic, words] = parts(t);
+        g.set(t, { y: 46, opacity: 0 });
+        g.set(box, { yPercent: 101, transition: 'none' }); // its CSS hover transition would smear the reveal
+        g.set(pic, { yPercent: -55, scale: 1.3 });
+        g.set(words, { y: 14, opacity: 0 });
+      });
+      const reveal = (els) => els.forEach((t, i) => {
+        if (t.dataset.shown) return;
+        t.dataset.shown = '1';
+        const [box, pic, words] = parts(t);
+        const at = i * 0.1;
+        g.timeline({ delay: at })
+          .to(t, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', clearProps: 'transform,opacity' })
+          .to(box, { yPercent: 0, duration: 1.05, ease: 'expo.out', clearProps: 'transform,transition' }, 0.05)
+          .to(pic, { yPercent: 0, scale: 1.12, duration: 1.35, ease: 'expo.out' }, 0.05)
+          .to(words, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', stagger: 0.06, clearProps: 'transform,opacity' }, 0.4);
+      });
+      ST.batch(cats, { start: 'top 94%', once: true, onEnter: reveal, onEnterBack: reveal, onLeave: reveal });
+    }
+
+    // Promise icons draw themselves stroke by stroke, then pop into place
+    root.querySelectorAll('.promises').forEach((box) => {
+      const icons = box.querySelectorAll('svg');
+      const lines = [...box.querySelectorAll('svg path, svg rect, svg circle')];
+      lines.forEach((s) => { const len = s.getTotalLength() + 1; s.style.strokeDasharray = len; s.style.strokeDashoffset = len; });
+      g.set(icons, { scale: 0.4, rotate: -25, opacity: 0 });
+      let drawn = false;
+      const draw = () => {
+        if (drawn) return;
+        drawn = true;
+        g.to(icons, { scale: 1, rotate: 0, opacity: 1, duration: 0.85, ease: 'back.out(2.4)', stagger: 0.1, clearProps: 'transform,opacity' });
+        g.to(lines, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut', stagger: 0.06, delay: 0.15, clearProps: 'strokeDasharray,strokeDashoffset' });
+      };
+      ST.create({ trigger: box, start: 'top 90%', once: true, onEnter: draw, onEnterBack: draw, onLeave: draw });
+    });
+
+    root.querySelectorAll('.gallery__track').forEach((t) => depth(t, 'img', 0.3, 0));
 
     const story = root.querySelector('.story');
     if (story && window.innerWidth >= 900) {
@@ -280,7 +358,7 @@ window.Motion = (() => {
       g.from(el.querySelectorAll('.star'), { opacity: 0, scale: 0.2, rotate: -40, duration: 0.5, ease: 'back.out(3)', stagger: 0.09, scrollTrigger: { trigger: el, start: 'top 94%', once: true } });
     });
 
-    if (fine) root.querySelectorAll('.card').forEach(tilt);
+    if (fine) root.querySelectorAll('.card, .cat').forEach(tilt);
 
     morphEnd(root.querySelector('#hero-figure'));
 
@@ -296,8 +374,11 @@ window.Motion = (() => {
     card.addEventListener('pointerenter', () => g.set(card, { transformPerspective: 900 }));
     card.addEventListener('pointermove', (e) => {
       const r = card.getBoundingClientRect();
-      ry(((e.clientX - r.left) / r.width - 0.5) * 9);
-      rx(-((e.clientY - r.top) / r.height - 0.5) * 7);
+      const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      ry((px - 0.5) * 9);
+      rx(-(py - 0.5) * 7);
+      card.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
+      card.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
     });
     card.addEventListener('pointerleave', () => { rx(0); ry(0); });
   }
@@ -326,6 +407,228 @@ window.Motion = (() => {
       down = false;
       if (!moved) return;
       g.to(rail, { scrollLeft: rail.scrollLeft - v * 380, duration: 0.9, ease: 'power3.out', onComplete: () => rail.classList.remove('dragging') });
+    });
+  }
+
+  /* ── Soft springs: cards hang on the page like iMessage bubbles. A flick leaves the ones far from
+     your finger trailing a little, then they settle back. Written to the CSS `translate` property so it
+     composes with the GSAP transforms used for reveals, presses and tilt. GSAP folds `translate` into its
+     own transform the first time it touches an element, so a press zeroes the spring first (springRelease).
+     Runs only while something moves. ── */
+  const SPRING = '.cat, .card, .promise, .review, .score, .step, .strip__item';
+  const K = 170, DAMP = 17, LAG = 0.2;
+  const springs = new Map();
+  const railPos = new Map();
+  const finger = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  let springIO = null, frame = 0, lastY = 0, lastT = 0;
+
+  function unspring(el) {
+    const s = springs.get(el);
+    if (!s) return;
+    el.style.translate = '';
+    springs.delete(el);
+  }
+
+  function springRelease(el) {
+    const s = springs.get(el);
+    if (!s || !s.moved) return;
+    s.x = s.vx = s.y = s.vy = 0;
+    s.moved = false;
+    el.style.translate = '';
+  }
+
+  function kick() {
+    if (frame || !springs.size) return;
+    lastT = performance.now();
+    frame = requestAnimationFrame(springStep);
+  }
+
+  function springObserve(root) {
+    if (!springIO) {
+      springIO = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) { unspring(e.target); return; }
+          if (springs.has(e.target)) return;
+          const pic = e.target.querySelector('.cat__img img');
+          springs.set(e.target, { x: 0, vx: 0, y: 0, vy: 0, moved: false, rail: e.target.parentElement.closest('.rail, .strip'), pic: pic && g.quickSetter(pic, 'y', 'px') });
+        });
+        kick();
+      }, { rootMargin: '12% 0px' });
+      const aim = (p) => { if (p) { finger.x = p.clientX; finger.y = p.clientY; } };
+      document.addEventListener('touchstart', (e) => aim(e.touches[0]), { passive: true });
+      document.addEventListener('touchmove', (e) => aim(e.touches[0]), { passive: true });
+      document.addEventListener('pointermove', (e) => { if (e.pointerType === 'mouse') aim(e); }, { passive: true });
+      // Capture catches rails scrolling sideways as well as the page
+      document.addEventListener('scroll', kick, { passive: true, capture: true });
+    }
+    lastY = window.scrollY;
+    railPos.clear();
+    root.querySelectorAll(SPRING).forEach((el) => springIO.observe(el));
+  }
+
+  function springReset() {
+    if (springIO) springIO.disconnect();
+    [...springs.keys()].forEach(unspring);
+    cancelAnimationFrame(frame);
+    frame = 0;
+  }
+
+  // Before a FLIP layout change: measure without any spring offset
+  function springSettle() {
+    springs.forEach((s, el) => { s.x = s.vx = s.y = s.vy = 0; s.moved = false; el.style.translate = ''; });
+  }
+
+  function springStep(now) {
+    frame = 0;
+    const dt = Math.min(1 / 30, Math.max(1 / 240, (now - lastT) / 1000));
+    lastT = now;
+    const y = window.scrollY;
+    let dy = y - lastY;
+    lastY = y;
+    if (Math.abs(dy) > 300) dy = 0; // a jump (route change, anchor) is not a flick
+    const vh = window.innerHeight, vw = window.innerWidth;
+    // Read everything first, then write, so the loop never forces extra layouts
+    const railD = new Map();
+    const reads = [];
+    springs.forEach((s, el) => {
+      let dx = 0;
+      if (s.rail) {
+        if (!railD.has(s.rail)) {
+          const left = s.rail.scrollLeft;
+          const d = railPos.has(s.rail) ? left - railPos.get(s.rail) : 0;
+          railPos.set(s.rail, left);
+          railD.set(s.rail, Math.abs(d) > 400 ? 0 : d);
+        }
+        dx = railD.get(s.rail);
+      }
+      reads.push([el, s, el.getBoundingClientRect(), dx]);
+    });
+    let live = false;
+    reads.forEach(([el, s, r, dx]) => {
+      const cy = r.top + r.height / 2 - s.y, cx = r.left + r.width / 2 - s.x;
+      if (dy) s.y += dy * LAG * Math.min(1, Math.abs(cy - finger.y) / (vh * 0.6));
+      if (dx) s.x += dx * LAG * Math.min(1, Math.abs(cx - finger.x) / (vw * 0.6));
+      s.vy += (-K * s.y - DAMP * s.vy) * dt; s.y += s.vy * dt;
+      s.vx += (-K * s.x - DAMP * s.vx) * dt; s.x += s.vx * dt;
+      const my = Math.min(16, r.height * 0.07), mx = Math.min(22, r.width * 0.08);
+      if (Math.abs(s.y) > my) { s.y = Math.sign(s.y) * my; s.vy = 0; }
+      if (Math.abs(s.x) > mx) { s.x = Math.sign(s.x) * mx; s.vx = 0; }
+      if (Math.abs(s.y) < 0.1 && Math.abs(s.vy) < 3 && Math.abs(s.x) < 0.1 && Math.abs(s.vx) < 3) {
+        s.x = s.vx = s.y = s.vy = 0;
+        if (s.moved) { el.style.translate = ''; s.moved = false; }
+      } else {
+        el.style.translate = `${s.x.toFixed(2)}px ${s.y.toFixed(2)}px`;
+        s.moved = true;
+        live = true;
+      }
+      // Depth inside category tiles: the photo drifts against the scroll (it is overscanned in CSS)
+      if (s.pic) s.pic(-((cy - vh / 2) / vh) * r.height * 0.09);
+    });
+    if (live || dy || [...railD.values()].some(Boolean)) frame = requestAnimationFrame(springStep);
+  }
+
+  /* Swipe depth: inside a full-width slider the photo moves slower than its slide, the caption a touch faster than the photo.
+     `layer` must be something GSAP never animates, because GSAP would fold this translate into its own transform. */
+  function depth(track, layer, pic, cap) {
+    if (!on || !track) return;
+    const slides = [...track.children];
+    const pics = slides.map((s) => s.querySelector(layer));
+    const caps = slides.map((s) => s.querySelector('.zoom__cap'));
+    let tick = false;
+    const run = () => {
+      tick = false;
+      const w = track.clientWidth || 1, left = track.scrollLeft;
+      slides.forEach((s, j) => {
+        const o = j * w - left;
+        if (Math.abs(o) > w * 1.2) return;
+        if (pics[j]) pics[j].style.translate = `${(-o * pic).toFixed(1)}px 0`;
+        if (caps[j] && cap) caps[j].style.translate = `${(-o * cap).toFixed(1)}px 0`;
+      });
+    };
+    track.addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(run); } }, { passive: true });
+    run();
+  }
+
+  /* ── Hero carousel: swipe between beds, the caption rises in for each, and the active dot fills
+     as a six-second timer (Web Animations, so it pauses and resumes exactly). The carousel moves on
+     when the fill finishes; it holds while a finger is down, the pointer hovers, a control has keyboard
+     focus, the hero is mostly off screen or the tab is hidden. ── */
+  const DWELL = 6000;
+  function carousel(zoom) {
+    const track = zoom && zoom.querySelector('.zoom-track');
+    if (!track) return;
+    const slides = [...track.children];
+    const dots = [...zoom.querySelectorAll('.zoom-dot')];
+    const auto = !reduce && !!Element.prototype.animate;
+    const hold = { touch: false, off: false, hover: false, focus: false };
+    let idx = -1, fill = null;
+    const width = () => Math.max(1, track.clientWidth);
+    const slideTo = (i) => track.scrollTo({ left: i * width(), behavior: reduce ? 'auto' : 'smooth' });
+    const sync = () => {
+      if (!fill) return;
+      const wait = hold.touch || hold.off || hold.hover || hold.focus || document.hidden;
+      if (wait && fill.playState === 'running') fill.pause();
+      else if (!wait && fill.playState === 'paused') fill.play();
+    };
+    const startFill = () => {
+      if (!auto) return;
+      if (fill) fill.cancel();
+      const bar = dots[idx] && dots[idx].querySelector('i');
+      if (!bar) return;
+      fill = bar.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: DWELL, easing: 'linear' });
+      fill.onfinish = () => slideTo((idx + 1) % slides.length);
+      sync();
+    };
+    const setActive = (i) => {
+      if (i === idx || !slides[i]) return;
+      idx = i;
+      slides.forEach((s, j) => s.classList.toggle('is-active', j === i));
+      dots.forEach((d, j) => d.setAttribute('aria-current', j === i ? 'true' : 'false'));
+      startFill();
+    };
+    let ticking = false;
+    track.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { ticking = false; setActive(Math.round(track.scrollLeft / width())); });
+    }, { passive: true });
+    // After the visitor takes over, the timer starts again from empty
+    dots.forEach((d, i) => d.addEventListener('click', () => { slideTo(i); startFill(); }));
+    const step = (n) => { slideTo(Math.min(slides.length - 1, Math.max(0, idx + n))); startFill(); };
+    const prev = zoom.querySelector('.zoom-arrow--prev'), next = zoom.querySelector('.zoom-arrow--next');
+    if (prev) prev.addEventListener('click', () => step(-1));
+    if (next) next.addEventListener('click', () => step(1));
+    zoom.classList.add('is-ready');
+    if (auto) zoom.classList.add('is-auto');
+    setActive(Math.round(track.scrollLeft / width()));
+    depth(track, '.zoom__frame', 0.35, 0.12);
+    if (!auto) return;
+    track.addEventListener('touchstart', () => { hold.touch = true; sync(); }, { passive: true });
+    const letGo = () => { hold.touch = false; startFill(); };
+    track.addEventListener('touchend', letGo, { passive: true });
+    track.addEventListener('touchcancel', letGo, { passive: true });
+    zoom.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hold.hover = true; sync(); } });
+    zoom.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hold.hover = false; sync(); } });
+    zoom.addEventListener('focusin', () => { hold.focus = true; sync(); });
+    zoom.addEventListener('focusout', (e) => { hold.focus = zoom.contains(e.relatedTarget); sync(); });
+    const io = new IntersectionObserver(([e]) => { hold.off = e.intersectionRatio < 0.5; sync(); }, { threshold: [0, 0.5, 1] });
+    io.observe(zoom);
+    document.addEventListener('visibilitychange', sync);
+    cleanups.push(() => { io.disconnect(); document.removeEventListener('visibilitychange', sync); if (fill) fill.cancel(); });
+  }
+
+  /* Photos that are still downloading shimmer, then fade in */
+  const SHIM_BOX = '.card__img, .cat__img, .zoom__frame, .story__media';
+  function shimmer(root) {
+    root.querySelectorAll('img').forEach((img) => {
+      if (img.complete) return;
+      const box = img.parentElement;
+      if (!box.matches(SHIM_BOX)) return;
+      box.classList.add('shim');
+      img.classList.add('img-wait');
+      const done = () => { box.classList.remove('shim'); img.classList.remove('img-wait'); img.classList.add('img-in'); };
+      img.addEventListener('load', done, { once: true });
+      img.addEventListener('error', done, { once: true });
     });
   }
 
@@ -408,6 +711,7 @@ window.Motion = (() => {
     if (!on || !FL) { mutate(); return; }
     // Finish a flip that is still running so rapid taps never stack states or leave a card faded out
     if (flipTl) { const t = flipTl; flipTl = null; t.progress(1); t.kill(); }
+    springSettle();
     const box = targets[0] && targets[0].parentElement;
     if (box && box._batch) { box._batch.forEach((t) => t.kill()); box._batch = null; }
     g.killTweensOf(targets);
@@ -424,7 +728,9 @@ window.Motion = (() => {
 
   function heart(btn) {
     btn.classList.remove('pop'); btn.offsetWidth; btn.classList.add('pop');
-    if (reduce || btn.getAttribute('aria-pressed') !== 'true') return;
+    if (btn.getAttribute('aria-pressed') !== 'true') return;
+    buzz(12);
+    if (reduce) return;
     for (let i = 0; i < 8; i++) {
       const a = (i / 8) * Math.PI * 2;
       const s = document.createElement('span');
@@ -447,6 +753,7 @@ window.Motion = (() => {
     setTimeout(() => {
       btn.classList.remove('is-loading');
       btn.classList.add('is-done');
+      buzz([10, 40, 18]);
       burstAt(btn, { n: 14, dist: 60 });
       const target = basketIcon();
       if (on && fromImg && target) {
