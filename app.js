@@ -33,11 +33,11 @@
     grid3: '<rect x="3" y="3" width="5" height="5" rx="1"/><rect x="9.5" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="16" y="9.5" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><rect x="9.5" y="16" width="5" height="5" rx="1"/><rect x="16" y="16" width="5" height="5" rx="1"/>'
   };
   const icon = (n, sw) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw || 1.6}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
-  const stars = (n) => `<span class="stars" data-stars aria-hidden="true">${'<span class="star">★</span>'.repeat(n || 5)}</span>`;
+  const meter = (score, cls) => `<span class="meter${cls || ''}" data-score="${score}" role="img" aria-label="Rated ${score} out of 5"><span class="meter__base" aria-hidden="true">★★★★★</span><span class="meter__fill" aria-hidden="true">★★★★★</span></span>`;
 
   function rating(p) {
     const src = S.SOURCES[p.src].name;
-    return `<p class="rating"><span class="sr">Rated ${p.rating} out of 5 from ${fmt(p.count)} reviews on ${src}.</span><span class="stars" aria-hidden="true">★★★★★</span><span aria-hidden="true">${p.rating.toFixed(1)} (${fmt(p.count)}) on ${src}</span></p>`;
+    return `<p class="rating"><span class="sr">Rated ${p.rating} out of 5 from ${fmt(p.count)} reviews on ${src}.</span>${meter(p.rating)}<span aria-hidden="true">${p.rating.toFixed(1)} (${fmt(p.count)}) on ${src}</span></p>`;
   }
 
   function heartBtn(p) {
@@ -59,7 +59,7 @@
       ${heartBtn(p)}
       <div class="card__body">
         <a class="card__name" href="#bed-${p.id}">${esc(p.name)} Bed</a>
-        <span class="card__meta"><span class="sr">Rated ${p.rating} out of 5 from ${fmt(p.count)} reviews on ${src}.</span><span aria-hidden="true">★ ${p.rating.toFixed(1)} (${fmt(p.count)})</span></span>
+        <span class="card__meta"><span class="sr">Rated ${p.rating} out of 5 from ${fmt(p.count)} reviews on ${src}.</span><span class="card__stars" aria-hidden="true">${meter(p.rating, ' meter--sm')} ${p.rating.toFixed(1)} (${fmt(p.count)})</span></span>
         <span class="card__src" aria-hidden="true">${src}</span>
         <span class="card__price">From ${money(p.min)}</span>
       </div>
@@ -107,9 +107,9 @@
     ['Can I return a bed?', 'Beds made to custom dimensions can\'t be returned, so please double-check your measurements. Our full returns policy is to be supplied.']
   ];
   function reviewCards(list) {
-    return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review"><span class="stars" data-stars role="img" aria-label="${r.stars} out of 5 stars">${'<span class="star" aria-hidden="true">★</span>'.repeat(r.stars)}</span><blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.date ? ` · ${r.date}` : ''}<br>Review left on ${S.SOURCES[r.src].name}</footer></figure>`).join('')}</div>`;
+    return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review">${meter(r.stars)}<blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.date ? ` · ${r.date}` : ''}<br>Review left on ${S.SOURCES[r.src].name}</footer></figure>`).join('')}</div>`;
   }
-  const scores = () => `<div class="scores" data-stagger>${Object.values(S.SOURCES).map((s) => `<div class="score"><b data-count-to="${s.rating}">${s.rating.toFixed(1)}</b>${stars(5)}<span class="muted">Average rating on ${s.name}</span></div>`).join('')}</div>`;
+  const scores = () => `<div class="scores" data-stagger>${Object.values(S.SOURCES).map((s) => `<div class="score"><b data-count-to="${s.rating}">${s.rating.toFixed(1)}</b>${meter(s.rating)}<span class="muted">Average rating on ${s.name}</span></div>`).join('')}</div>`;
 
   /* ── Home ── */
   function home() {
@@ -319,7 +319,7 @@
     const si = () => S.SIZES.findIndex((s) => s.id === cfg.size);
     const unit = () => p.prices[si()] + pick(S.HEADBOARDS, cfg.height).price + pick(S.STORAGE, cfg.storage).price + pick(S.OTTOMAN_BOX, cfg.box).price
       + pick(S.MATTRESS, cfg.mattress).price + pick(S.DELIVERY, cfg.delivery).price + pick(S.ASSEMBLY, cfg.assembly).price;
-    const ART = { size: Art.size, storage: Art.storage, mattress: Art.mattress, box: Art.box };
+    const ART = { size: Art.size, height: Art.height, storage: Art.storage, mattress: Art.mattress, box: Art.box };
     const opt = (name, o, e) => {
       e = e || {};
       const art = ART[name] ? ART[name](o.id) : '';

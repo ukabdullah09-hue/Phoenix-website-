@@ -228,6 +228,7 @@ window.Motion = (() => {
   function page(root, first) {
     buttons(document);
     faq(root);
+    meters(root);
     carousel(root.querySelector('.zoom'));
     if (!on) { morphCancel(); return; }
     const d0 = first ? heroDelay : 0;
@@ -386,6 +387,21 @@ window.Motion = (() => {
 
   let refreshT = 0;
   const refreshSoon = () => { clearTimeout(refreshT); refreshT = setTimeout(() => ST.refresh(), 200); };
+
+  /* Gold stars fill to the real score when they scroll into view */
+  function meters(root) {
+    root.querySelectorAll('.meter').forEach((m) => {
+      const fill = m.querySelector('.meter__fill');
+      const to = Math.min(5, parseFloat(m.dataset.score) || 0) / 5 * 100;
+      if (!on) { fill.style.width = to + '%'; return; }
+      const o = { w: 0 };
+      fill.style.width = '0%';
+      ST.create({ trigger: m, start: 'top 92%', once: true, onEnter: () => {
+        g.to(o, { w: to, duration: 1.5, ease: 'power3.out', onUpdate: () => { fill.style.width = o.w.toFixed(2) + '%'; } });
+        g.fromTo(m, { scale: 0.9 }, { scale: 1, duration: 0.9, ease: 'back.out(2)', clearProps: 'transform' });
+      } });
+    });
+  }
 
   function tilt(card) {
     if (card.dataset.tilt) return;
