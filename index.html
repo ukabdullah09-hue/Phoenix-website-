@@ -1,326 +1,64 @@
-<!DOCTYPE html>
-<html lang="en-GB">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phoenix Beds — Bespoke Beds &amp; Mattresses, Dewsbury</title>
-  <meta name="description" content="Phoenix Beds is a Dewsbury-based manufacturer of bespoke beds and mattresses, made to order. Every piece is crafted in-house to your exact specification." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+<title>Phoenix Beds</title>
+<meta name="description" content="Beds and mattresses made to order in Dewsbury, West Yorkshire.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
 
-  <!-- PAGE LOADER -->
-  <div id="page-loader">
-    <img src="logo.jpg" alt="Phoenix Beds" class="loader-logo" />
-    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
-  </div>
-
-  <!-- NAV -->
-  <nav class="site-nav" role="navigation" aria-label="Main navigation">
-    <a href="index.html" class="nav__logo" aria-label="Phoenix Beds home">
-      <img src="logo.jpg" alt="" class="nav__logo-img" />
-      <div class="nav__logo-text">
-        <span class="nav__logo-name">Phoenix Beds</span>
-        <span class="nav__logo-sub">Dewsbury, West Yorkshire</span>
-      </div>
-    </a>
-    <ul class="nav__links" role="list">
-      <li><a href="index.html" class="nav__link active">Home</a></li>
-      <li><a href="collections.html" class="nav__link">Collections</a></li>
-      <li><a href="contact.html" class="nav__link">Contact</a></li>
+<div class="loader" id="loader" aria-hidden="true"><div class="loader__inner"><span class="loader__word">Phoenix Beds</span><span class="loader__bar"></span></div></div>
+<div class="progress-top" id="progress-top" aria-hidden="true"></div>
+<p class="announce">Handmade to order in Dewsbury. Pay the balance on delivery.</p>
+<header class="gnav" id="gnav">
+  <nav class="wrap" aria-label="Main">
+    <a class="wordmark" href="#home">Phoenix Beds</a>
+    <ul>
+      <li><a href="#shop" data-nav="shop">Beds</a></li>
+      <li><a href="#shop-mattresses" data-nav="shop-mattresses">Mattresses</a></li>
+      <li><a href="#shop-storage" data-nav="shop-storage">Storage beds</a></li>
+      <li><a href="#finder" data-nav="finder">Bed finder</a></li>
+      <li><a href="#reviews" data-nav="reviews">Reviews</a></li>
+      <li><a href="#help" data-nav="help">Help</a></li>
     </ul>
-    <a href="contact.html" class="nav__cta">Get a Quote</a>
-    <button class="nav__burger" aria-label="Open menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="icons">
+      <a class="bag-link" href="#wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9.2-8.8C1.3 8 3.2 4.5 6.6 4.5c2 0 3.3 1.1 5.4 3.3 2.1-2.2 3.4-3.3 5.4-3.3 3.4 0 5.3 3.5 3.8 6.7C19 15.6 12 20 12 20z"/></svg><span class="count" data-count="wish" hidden></span></a>
+      <a class="bag-link" href="#basket" aria-label="Basket" data-basket-icon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="count" data-count="bag" hidden></span></a>
+    </div>
   </nav>
+</header>
 
-  <!-- MOBILE NAV -->
-  <div class="nav__mobile" role="dialog" aria-modal="true" aria-label="Mobile navigation">
-    <a href="index.html" class="nav__link">Home</a>
-    <a href="collections.html" class="nav__link">Collections</a>
-    <a href="contact.html" class="nav__link">Contact</a>
-    <a href="contact.html" class="btn btn--fire" style="margin-top:1rem;"><span>Get a Quote</span></a>
+<main id="view" class="view" tabindex="-1"></main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div><h2>Shop</h2><ul><li><a href="#shop">All beds</a></li><li><a href="#shop-luxury">Luxury beds</a></li><li><a href="#shop-premium">Premium beds</a></li><li><a href="#shop-gaslift">Gaslift and drawers</a></li><li><a href="#shop-storage">Storage beds</a></li><li><a href="#shop-mattresses">Mattresses</a></li></ul></div>
+      <div><h2>Help</h2><ul><li><a href="#finder">Bed finder</a></li><li><a href="#help">How ordering works</a></li><li><a href="#help">Delivery</a></li><li><a href="#help">Returns</a></li><li><a href="#help">Terms and conditions</a></li></ul></div>
+      <div><h2>Phoenix Beds</h2><ul><li><a href="#story">Our story</a></li><li><a href="#reviews">Reviews</a></li><li>Dewsbury, West Yorkshire</li></ul></div>
+      <div><h2>Contact</h2><ul><li>Phone: <span class="tbs">to be supplied</span></li><li>Email: <span class="tbs">to be supplied</span></li><li>WhatsApp: <span class="tbs">to be supplied</span></li><li>Hours: <span class="tbs">to be supplied</span></li></ul></div>
+    </div>
+    <div class="footer__base"><p>Preview build. Every picture is one placeholder photo until product photos are supplied. Prices marked as placeholders need confirming.</p><p>Phoenix Beds, Dewsbury, West Yorkshire.</p></div>
   </div>
+</footer>
 
-  <!-- HERO -->
-  <section class="hero">
-    <canvas id="hero-canvas" aria-hidden="true"></canvas>
-    <div class="hero__overlay" aria-hidden="true"></div>
-    <div class="hero__inner">
-      <div class="hero__eyebrow" data-reveal>
-        <span class="hero__eyebrow-line" aria-hidden="true"></span>
-        <span class="eyebrow">Handcrafted in Dewsbury</span>
-      </div>
-      <h1 class="hero__headline" data-reveal data-delay="100">
-        Where Craft<br>Meets <em>Sleep</em>
-      </h1>
-      <p class="hero__sub" data-reveal data-delay="200">
-        Every Phoenix bed is manufactured by us, to order, here in West Yorkshire.
-        No middlemen. No compromises. Just exceptional bespoke beds and mattresses
-        built to last.
-      </p>
-      <div class="hero__actions" data-reveal data-delay="300">
-        <a href="collections.html" class="btn btn--fire"><span>View Collections</span></a>
-        <a href="contact.html" class="btn btn--outline">Request a Quote</a>
-      </div>
-    </div>
-    <div class="hero__scroll-hint" aria-hidden="true">
-      <span>Scroll</span>
-      <div class="hero__scroll-arrow"></div>
-    </div>
-  </section>
+<nav class="tabbar" aria-label="Quick links">
+  <a href="#home" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+  <a href="#shop" data-tab="shop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7M3 14h18M3 18v2M21 18v2M7 9V6a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/></svg>Shop</a>
+  <a href="#reviews" data-tab="reviews"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Reviews</a>
+  <a href="#wishlist" data-tab="wishlist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-9.2-8.8C1.3 8 3.2 4.5 6.6 4.5c2 0 3.3 1.1 5.4 3.3 2.1-2.2 3.4-3.3 5.4-3.3 3.4 0 5.3 3.5 3.8 6.7C19 15.6 12 20 12 20z"/></svg>Wishlist<span class="count" data-count="wish" hidden></span></a>
+  <a href="#basket" data-tab="basket" data-basket-icon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>Basket<span class="count" data-count="bag" hidden></span></a>
+</nav>
 
-  <!-- CRAFT STRIP -->
-  <div class="craft-strip">
-    <div class="container">
-      <div class="craft-strip__grid">
-        <div class="craft-item" data-reveal>
-          <svg class="craft-item__icon" viewBox="0 0 48 48" fill="none" stroke-width="2" aria-hidden="true">
-            <path d="M24 6c6 7-5 10-2 17 1.5 3.5 6 3.5 8 0 2 6-2 13-10 13s-12-6-12-13c0-5 3-8 6-12-1 3 1 5 3 3 1.5-1.5 1.5-5-1-8 3 1 6 0 8 0z" stroke-linejoin="round"/>
-          </svg>
-          <div class="craft-item__label">Made To Order</div>
-          <div class="craft-item__sub">Every piece built for you</div>
-        </div>
-        <div class="craft-item" data-reveal data-delay="80">
-          <svg class="craft-item__icon" viewBox="0 0 48 48" fill="none" stroke-width="2" aria-hidden="true">
-            <rect x="8" y="22" width="32" height="18" rx="1"/>
-            <path d="M8 22l10-12h12l10 12"/>
-            <path d="M18 10v8M30 10v8"/>
-          </svg>
-          <div class="craft-item__label">Our Own Factory</div>
-          <div class="craft-item__sub">Manufactured in Dewsbury</div>
-        </div>
-        <div class="craft-item" data-reveal data-delay="160">
-          <svg class="craft-item__icon" viewBox="0 0 48 48" fill="none" stroke-width="2" aria-hidden="true">
-            <path d="M8 40L40 8" stroke-linecap="round"/>
-            <path d="M12 36l4 4M18 30l4 4M24 24l4 4M30 18l4 4" stroke-linecap="round"/>
-          </svg>
-          <div class="craft-item__label">Bespoke Sizing</div>
-          <div class="craft-item__sub">Any dimension, any specification</div>
-        </div>
-        <div class="craft-item" data-reveal data-delay="240">
-          <svg class="craft-item__icon" viewBox="0 0 48 48" fill="none" stroke-width="2" aria-hidden="true">
-            <circle cx="16" cy="14" r="4"/>
-            <path d="M16 18v8c0 6 4 10 10 14M26 36c4-2 6-6 6-10v-4" stroke-linecap="round"/>
-            <path d="M26 20c3 0 5-2 5-5" stroke-linecap="round"/>
-          </svg>
-          <div class="craft-item__label">Beds &amp; Mattresses</div>
-          <div class="craft-item__sub">Full range, one manufacturer</div>
-        </div>
-      </div>
-    </div>
-  </div>
+<button class="wa" type="button" id="wa-btn" aria-label="Chat on WhatsApp" aria-expanded="false" aria-controls="wa-sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.2A8.5 8.5 0 1 1 20 11.5z"/><path d="M9 8.5c0 3.3 2.7 6.5 6.5 6.5l1-1.6-2-1-1 .8c-1-.4-2.3-1.7-2.7-2.7l.8-1-1-2z"/></svg></button>
+<div class="sheet" id="wa-sheet" role="dialog" aria-labelledby="wa-title" hidden>
+  <h2 id="wa-title">WhatsApp us</h2>
+  <p class="muted">Our WhatsApp number is <span style="color:var(--warn)">to be supplied</span>. Once it's added, this button opens a chat with us.</p>
+  <button class="btn btn--soft" type="button" id="wa-close">Close</button>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
 
-  <!-- COLLECTIONS PREVIEW -->
-  <section class="collections-section">
-    <div class="container" style="padding-bottom:3rem;">
-      <div class="section-header text-center" data-reveal>
-        <p class="eyebrow">Our Work</p>
-        <div class="divider"></div>
-        <h2 class="display-2" style="color:var(--white);margin-top:1rem;">The Collections</h2>
-        <p style="color:var(--silver);margin-top:1rem;max-width:48ch;margin-inline:auto;font-size:1rem;">
-          From statement ottoman frames to cloud-soft memory mattresses — every product we sell is made by us.
-        </p>
-      </div>
-    </div>
-    <div class="collections-grid">
-      <a href="collections.html" class="collection-card" data-reveal>
-        <div class="collection-card__bg" style="background-image: url('images/bed-chesterfield-ottoman.jpg');"></div>
-        <div class="collection-card__overlay"></div>
-        <div class="collection-card__content">
-          <div class="collection-card__tag">Beds</div>
-          <h3 class="collection-card__name">Ottoman<br>Frames</h3>
-          <p class="collection-card__desc">Hydraulic storage beds crafted in premium fabrics and velvets.</p>
-          <div class="collection-card__cta">
-            Explore <span class="collection-card__cta-arrow"></span>
-          </div>
-        </div>
-      </a>
-      <a href="collections.html" class="collection-card" data-reveal data-delay="100">
-        <div class="collection-card__bg" style="background-image: url('images/bed-chrome-panel.jpg');"></div>
-        <div class="collection-card__overlay"></div>
-        <div class="collection-card__content">
-          <div class="collection-card__tag">Beds</div>
-          <h3 class="collection-card__name">Panel &amp;<br>Wing Beds</h3>
-          <p class="collection-card__desc">Upholstered headboards built to your specification and fabric choice.</p>
-          <div class="collection-card__cta">
-            Explore <span class="collection-card__cta-arrow"></span>
-          </div>
-        </div>
-      </a>
-      <a href="collections.html" class="collection-card" data-reveal data-delay="200">
-        <div class="collection-card__bg" style="background-image: url('images/bed-cream-channel.jpg');"></div>
-        <div class="collection-card__overlay"></div>
-        <div class="collection-card__content">
-          <div class="collection-card__tag">Beds</div>
-          <h3 class="collection-card__name">Channel<br>Tufted</h3>
-          <p class="collection-card__desc">Tall tufted panel beds finished in your choice of fabric.</p>
-          <div class="collection-card__cta">
-            Explore <span class="collection-card__cta-arrow"></span>
-          </div>
-        </div>
-      </a>
-    </div>
-    <div style="text-align:center;padding:3rem 0 0;">
-      <a href="collections.html" class="btn btn--ghost" data-reveal>View All Products</a>
-    </div>
-  </section>
-
-  <!-- HOW WE WORK -->
-  <section class="process-section">
-    <div class="container">
-      <div class="process-grid">
-        <div>
-          <div class="section-header" data-reveal>
-            <p class="eyebrow">The Process</p>
-            <div class="divider divider--left" style="margin-top:0.75rem;"></div>
-            <h2 class="display-2" style="color:var(--white);margin-top:1rem;">
-              Made by us.<br>
-              <em class="italic text-ember">For you.</em>
-            </h2>
-          </div>
-          <div class="process-steps">
-            <div class="process-step" data-reveal data-delay="100">
-              <span class="process-step__number">01</span>
-              <div class="process-step__body">
-                <h3 class="process-step__title">Choose Your Specification</h3>
-                <p class="process-step__text">Size, fabric, firmness, storage type — we walk you through every option so your bed fits your room and your life exactly.</p>
-              </div>
-            </div>
-            <div class="process-step" data-reveal data-delay="180">
-              <span class="process-step__number">02</span>
-              <div class="process-step__body">
-                <h3 class="process-step__title">We Build It In-House</h3>
-                <p class="process-step__text">Our craftspeople manufacture your bed at our Dewsbury facility — no outsourcing, no third-party suppliers, full quality control from start to finish.</p>
-              </div>
-            </div>
-            <div class="process-step" data-reveal data-delay="260">
-              <span class="process-step__number">03</span>
-              <div class="process-step__body">
-                <h3 class="process-step__title">Delivered &amp; Installed</h3>
-                <p class="process-step__text">We deliver to your home and can assist with installation. Contact us for details on delivery areas and timescales for your order.</p>
-              </div>
-            </div>
-          </div>
-          <div style="margin-top:2.5rem;" data-reveal data-delay="340">
-            <a href="contact.html" class="btn btn--fire"><span>Start Your Order</span></a>
-          </div>
-        </div>
-        <div class="process-visual" data-reveal="right" aria-hidden="true">
-          <img src="images/bed-chrome-panel-detail.jpg" alt="" style="width:100%;height:100%;object-fit:cover;filter:brightness(0.8) saturate(0.85);" />
-          <div class="process-visual__glow"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TESTIMONIALS -->
-  <section class="testimonials-section">
-    <div class="container">
-      <div class="section-header text-center" data-reveal>
-        <p class="eyebrow">Customer Stories</p>
-        <div class="divider"></div>
-        <h2 class="display-3" style="color:var(--white);margin-top:1rem;">What Our Customers Say</h2>
-        <p class="notice" style="max-width:42ch;margin:1.25rem auto 0;text-align:left;">
-          <strong>Note to Usman:</strong> These are placeholder reviews. Please supply real customer testimonials and we'll replace them.
-        </p>
-      </div>
-      <div class="testimonials-grid">
-        <div class="testimonial-card" data-reveal>
-          <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__quote">"Ordered a bespoke ottoman bed — the quality is outstanding. You can tell it's been made with care. Nothing like buying flat-pack from a superstore."</p>
-          <div class="testimonial-card__author">A. Khan</div>
-          <div class="testimonial-card__location">Bradford</div>
-        </div>
-        <div class="testimonial-card" data-reveal data-delay="100">
-          <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__quote">"We had an unusual room size so needed a non-standard bed. Phoenix Beds built exactly what we needed. The mattress is incredible comfort."</p>
-          <div class="testimonial-card__author">S. Patel</div>
-          <div class="testimonial-card__location">Leeds</div>
-        </div>
-        <div class="testimonial-card" data-reveal data-delay="200">
-          <div class="testimonial-card__stars">★★★★★</div>
-          <p class="testimonial-card__quote">"Genuinely impressed. Spoke to them directly, they listened, and the bed arrived exactly as specified. Will be back for our guest room."</p>
-          <div class="testimonial-card__author">R. Thompson</div>
-          <div class="testimonial-card__location">Huddersfield</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA BAND -->
-  <section class="cta-band">
-    <div class="cta-band__glow" aria-hidden="true"></div>
-    <div class="container--narrow">
-      <p class="cta-band__pre">Ready to Begin?</p>
-      <h2 class="cta-band__headline">
-        Your Bed, Built<br>to Your Specification
-      </h2>
-      <p class="cta-band__sub">
-        Get in touch with our team in Dewsbury. We'll talk you through sizing, fabrics and options — no pressure, just honest advice.
-      </p>
-      <div class="cta-band__actions">
-        <a href="contact.html" class="btn btn--fire"><span>Get a Free Quote</span></a>
-        <a href="collections.html" class="btn btn--outline">Browse Collections</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="site-footer" role="contentinfo">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <div class="footer-brand__logo">
-            <img src="logo.jpg" alt="Phoenix Beds" class="footer-brand__logo-img" />
-            <span class="footer-brand__logo-name">Phoenix Beds</span>
-          </div>
-          <p class="footer-brand__tagline">"We Care For Your Sleep."</p>
-          <p style="font-size:0.82rem;color:var(--silver-dk);max-width:26ch;line-height:1.6;">
-            Bespoke beds and mattresses, manufactured in-house at our Dewsbury facility.
-          </p>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col__heading">Navigate</p>
-          <ul class="footer-col__links" role="list">
-            <li><a href="index.html" class="footer-col__link">Home</a></li>
-            <li><a href="collections.html" class="footer-col__link">Collections</a></li>
-            <li><a href="contact.html" class="footer-col__link">Contact Us</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col__heading">Products</p>
-          <ul class="footer-col__links" role="list">
-            <li><a href="collections.html" class="footer-col__link">Ottoman Beds</a></li>
-            <li><a href="collections.html" class="footer-col__link">Panel Beds</a></li>
-            <li><a href="collections.html" class="footer-col__link">Mattresses</a></li>
-            <li><a href="collections.html" class="footer-col__link">Bespoke Orders</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <p class="footer-col__heading">Contact</p>
-          <ul class="footer-col__links" role="list">
-            <li class="footer-col__link" style="color:var(--silver-dk);">Dewsbury, West Yorkshire</li>
-            <li><a href="contact.html" class="footer-col__link">Send an Enquiry</a></li>
-          </ul>
-          <p class="notice" style="margin-top:1rem;font-size:0.75rem;">
-            <strong>Missing:</strong> Phone number and email address not supplied — please provide to complete footer.
-          </p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p class="footer-bottom__copy">&copy; 2025 Phoenix Beds UK. All rights reserved.</p>
-        <nav class="footer-bottom__links" aria-label="Legal">
-          <a href="#" class="footer-bottom__link">Privacy Policy</a>
-          <a href="#" class="footer-bottom__link">Terms</a>
-        </nav>
-      </div>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
-</body>
-</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+<script src="data.js"></script>
+<script src="motion.js"></script>
+<script src="app.js"></script>
