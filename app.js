@@ -1,6 +1,7 @@
 (() => {
   const S = window.STORE;
   const M = window.Motion;
+  const Art = window.Art;
   const { money } = S;
   const view = document.getElementById('view');
   const PHOTO = 'images/bed.jpg';
@@ -318,9 +319,11 @@
     const si = () => S.SIZES.findIndex((s) => s.id === cfg.size);
     const unit = () => p.prices[si()] + pick(S.HEADBOARDS, cfg.height).price + pick(S.STORAGE, cfg.storage).price + pick(S.OTTOMAN_BOX, cfg.box).price
       + pick(S.MATTRESS, cfg.mattress).price + pick(S.DELIVERY, cfg.delivery).price + pick(S.ASSEMBLY, cfg.assembly).price;
+    const ART = { size: Art.size, storage: Art.storage, mattress: Art.mattress, box: Art.box };
     const opt = (name, o, e) => {
       e = e || {};
-      return `<label class="opt"><input type="radio" name="${name}" value="${o.id}" ${cfg[name] === o.id ? 'checked' : ''}><span><b>${o.name}</b><em>${e.price || (o.price ? '+' + money(o.price) : 'Included')}</em><i>${e.note || o.note || ''}${o.placeholder ? ' · placeholder price' : ''}</i></span></label>`;
+      const art = ART[name] ? ART[name](o.id) : '';
+      return `<label class="opt"><input type="radio" name="${name}" value="${o.id}" ${cfg[name] === o.id ? 'checked' : ''}><span>${art}<b>${o.name}</b><em>${e.price || (o.price ? '+' + money(o.price) : 'Included')}</em><i>${e.note || o.note || ''}${o.placeholder ? ' · placeholder price' : ''}</i></span></label>`;
     };
     const placeholderSizes = p.sizePricesPlaceholder || (p.pricePlaceholderSizes || []).length;
     const bullets = p.bullets || ['Built to order in our Dewsbury workshop', 'Every UK size, from single to super king', 'Plush velvet or Naples fabric in the colour you choose', '24-month warranty on frame and stitching'];

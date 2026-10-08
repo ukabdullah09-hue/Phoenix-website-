@@ -47,7 +47,7 @@ window.STORE = (() => {
     { id: 'standard', name: 'Standard base', note: 'Slatted base, no storage', price: 0 },
     { id: 'underbed', name: 'Solid under-bed', note: 'Sturdy base, no lift mechanism', price: 30, placeholder: true },
     { id: 'drawers', name: 'Drawers', note: 'Two or four deep drawers', price: 60 },
-    { id: 'gaslift', name: 'Gaslift ottoman', note: 'The whole base lifts for storage', price: 45, placeholder: true }
+    { id: 'gaslift', name: 'Gas lift storage', note: 'The whole base lifts up for access', price: 45, placeholder: true }
   ];
 
   const OTTOMAN_BOX = [
