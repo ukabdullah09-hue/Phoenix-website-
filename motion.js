@@ -169,7 +169,8 @@ window.Motion = (() => {
       window.addEventListener('pointerup', release);
       window.addEventListener('pointercancel', release);
       const tab = el.closest('.tabbar a');
-      if (tab) g.fromTo(tab.querySelector('svg'), { y: 0 }, { y: -7, duration: 0.16, yoyo: true, repeat: 1, ease: 'power2.out' });
+      // Web Animations, not GSAP: GSAP measures a bare <svg> by moving it in the DOM and puts it back after the label
+      if (tab) tab.querySelector('svg').animate([{ transform: 'none' }, { transform: 'translateY(-7px)' }, { transform: 'none' }], { duration: 320, easing: 'ease-out' });
     }, { passive: true });
   }
 
@@ -238,15 +239,17 @@ window.Motion = (() => {
       const inset = window.innerWidth < 700 ? '6% 5% 6% 5%' : '10% 16% 10% 16%';
       // A full-screen blur costs phones a lot of frames; they get a plain fade instead
       if (fine) g.fromTo(imgs[0], { filter: 'blur(14px)' }, { filter: 'blur(0px)', duration: 1.4, ease: 'power2.out', delay: d0, clearProps: 'filter' });
-      else g.from(imgs[0], { opacity: 0, duration: 1, ease: 'power2.out', delay: d0, clearProps: 'opacity' });
-      if (track) g.set(zoom, { '--cap': 0 }); else g.set(cap, { opacity: 0, y: 30 });
-      const tl = g.timeline({ scrollTrigger: { trigger: zoom, start: 'top top', end: '+=80%', scrub: 0.6, pin: true, anticipatePin: 1 } });
+      else if (imgs[0].complete) g.from(imgs[0], { opacity: 0, duration: 1, ease: 'power2.out', delay: d0, clearProps: 'opacity' });
+      // Caption, dots and arrows stay untappable until they have faded in
+      if (track) { g.set(zoom, { '--cap': 0 }); zoom.classList.add('cap-off'); } else g.set(cap, { opacity: 0, y: 30 });
+      const tl = g.timeline({ scrollTrigger: { trigger: zoom, start: 'top top', end: '+=80%', scrub: 0.6, pin: true, anticipatePin: 1,
+        onUpdate: track ? (self) => zoom.classList.toggle('cap-off', self.progress < 0.65) : undefined } });
       tl.fromTo(frame, { clipPath: `inset(${inset} round 28px)` }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none', duration: 1 })
         .fromTo(imgs, { scale: 1.22 }, { scale: 1, ease: 'none', duration: 1 }, 0);
       if (track) tl.to(zoom, { '--cap': 1, duration: 0.35, ease: 'power2.out' }, 0.65);
       else tl.to(cap, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, 0.65);
       const introEl = root.querySelector('.hero-intro');
-      if (introEl) g.to(introEl, { opacity: 0, y: -60, ease: 'none', scrollTrigger: { trigger: zoom, start: 'top 55%', end: 'top top', scrub: true } });
+      if (introEl) g.to(introEl, { opacity: 0, y: -60, ease: 'none', scrollTrigger: { trigger: zoom, start: 0, end: 'top top', scrub: true } });
     }
 
     // Category tiles: each rises, then its photo wipes up from the bottom while the picture settles inside
@@ -362,16 +365,19 @@ window.Motion = (() => {
 
     morphEnd(root.querySelector('#hero-figure'));
 
-    root.querySelectorAll('img').forEach((img) => { if (!img.complete) img.addEventListener('load', () => ST.refresh(), { once: true }); });
+    root.querySelectorAll('img').forEach((img) => { if (!img.complete) img.addEventListener('load', refreshSoon, { once: true }); });
     requestAnimationFrame(() => ST.refresh());
   }
+
+  let refreshT = 0;
+  const refreshSoon = () => { clearTimeout(refreshT); refreshT = setTimeout(() => ST.refresh(), 200); };
 
   function tilt(card) {
     if (card.dataset.tilt) return;
     card.dataset.tilt = '1';
     const rx = g.quickTo(card, 'rotationX', { duration: 0.5, ease: 'power3' });
     const ry = g.quickTo(card, 'rotationY', { duration: 0.5, ease: 'power3' });
-    card.addEventListener('pointerenter', () => g.set(card, { transformPerspective: 900 }));
+    card.addEventListener('pointerenter', () => { springRelease(card); g.set(card, { transformPerspective: 900 }); });
     card.addEventListener('pointermove', (e) => {
       const r = card.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
@@ -501,6 +507,11 @@ window.Motion = (() => {
         }
         dx = railD.get(s.rail);
       }
+      if (g.isTweening(el)) {
+        // A reveal ending with clearProps folds any live `translate` into GSAP's transform for good
+        if (s.moved) { s.x = s.vx = s.y = s.vy = 0; s.moved = false; el.style.translate = ''; }
+        return;
+      }
       reads.push([el, s, el.getBoundingClientRect(), dx]);
     });
     let live = false;
@@ -602,6 +613,12 @@ window.Motion = (() => {
     if (auto) zoom.classList.add('is-auto');
     setActive(Math.round(track.scrollLeft / width()));
     depth(track, '.zoom__frame', 0.35, 0.12);
+    if (on) {
+      // Every ScrollTrigger refresh (rotation, resize) re-parents the pinned hero, which resets the track to slide 1 without a scroll event
+      const keep = () => { if (Math.round(track.scrollLeft / width()) !== idx) track.scrollTo({ left: idx * width(), behavior: 'auto' }); };
+      ST.addEventListener('refresh', keep);
+      cleanups.push(() => ST.removeEventListener('refresh', keep));
+    }
     if (!auto) return;
     track.addEventListener('touchstart', () => { hold.touch = true; sync(); }, { passive: true });
     const letGo = () => { hold.touch = false; startFill(); };
@@ -609,9 +626,10 @@ window.Motion = (() => {
     track.addEventListener('touchcancel', letGo, { passive: true });
     zoom.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') { hold.hover = true; sync(); } });
     zoom.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { hold.hover = false; sync(); } });
-    zoom.addEventListener('focusin', () => { hold.focus = true; sync(); });
-    zoom.addEventListener('focusout', (e) => { hold.focus = zoom.contains(e.relatedTarget); sync(); });
-    const io = new IntersectionObserver(([e]) => { hold.off = e.intersectionRatio < 0.5; sync(); }, { threshold: [0, 0.5, 1] });
+    zoom.addEventListener('focusin', (e) => { hold.focus = e.target.matches(':focus-visible'); sync(); });
+    zoom.addEventListener('focusout', (e) => { const t = e.relatedTarget; hold.focus = !!(t && zoom.contains(t) && t.matches(':focus-visible')); sync(); });
+    // The pin moves the hero in and out of its spacer, so one batch can hold stale entries: the newest one is the truth
+    const io = new IntersectionObserver((es) => { const e = es[es.length - 1]; hold.off = !e.isIntersecting || e.intersectionRatio < 0.5; sync(); }, { threshold: [0, 0.5, 1] });
     io.observe(zoom);
     document.addEventListener('visibilitychange', sync);
     cleanups.push(() => { io.disconnect(); document.removeEventListener('visibilitychange', sync); if (fill) fill.cancel(); });
@@ -902,5 +920,5 @@ window.Motion = (() => {
     if (on && el) g.fromTo(el, { rotate: 0 }, { rotate: 360, duration: 0.7, ease: 'back.out(1.6)' });
   }
 
-  return { on, reduce, loader, intro, progress, nav, pressFx, buttons, reset, page, ring, seg, chips, flip, heart, addToBag, bump, money, flipNum, pop, fadeSwap, textSwap, flash, shake, collapse, slideIn, slideOut, morphStart, morphCancel, transition, sheet, spin, burst, burstAt, splitWords };
+  return { on, reduce, onReset: (fn) => cleanups.push(fn), loader, intro, progress, nav, pressFx, buttons, reset, page, ring, seg, chips, flip, heart, addToBag, bump, money, flipNum, pop, fadeSwap, textSwap, flash, shake, collapse, slideIn, slideOut, morphStart, morphCancel, transition, sheet, spin, burst, burstAt, splitWords };
 })();

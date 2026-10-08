@@ -190,12 +190,12 @@
         <div class="actions"><a class="btn btn--fill btn--glint" href="#finder"><span class="lbl">Start the bed finder</span></a></div>
       </section>
 
-      <section class=”section” aria-labelledby=”homes-t”>
-        <div class=”wrap”>
-          <div class=”head head--center”><h2 id=”homes-t” data-brighten>What customers say.</h2><p>Reviews labelled by source (UK DMCC Act 2024).</p></div>
+      <section class="section" aria-labelledby="homes-t">
+        <div class="wrap">
+          <div class="head head--center"><h2 id="homes-t" data-brighten>What customers say.</h2><p>Reviews labelled by source (UK DMCC Act 2024).</p></div>
           ${reviewCards(S.REVIEWS)}
           ${scores()}
-          <p style=”text-align:center;margin-top:1.5rem”><a class=”link” href=”#reviews”>Read all reviews</a></p>
+          <p style="text-align:center;margin-top:1.5rem"><a class="link" href="#reviews">Read all reviews</a></p>
         </div>
       </section>
 
@@ -298,7 +298,9 @@
           placeSort();
           ctl.apply(null, b.dataset.sort, true);
         }));
-        window.addEventListener('resize', () => { if (shopCtl === ctl) { placePill(true); placeSort(); placeSize(); } });
+        const onResize = () => { if (shopCtl === ctl) { placePill(true); placeSort(); placeSize(); } };
+        window.addEventListener('resize', onResize);
+        M.onReset(() => window.removeEventListener('resize', onResize));
         describe();
         shopCtl = ctl;
       }
@@ -439,7 +441,9 @@
         if (animate && ch.innerHTML !== chosen) M.fadeSwap(ch, chosen); else ch.innerHTML = chosen;
       };
       const rings = [...form.querySelectorAll('.opts')].map((o) => M.ring(o));
-      window.addEventListener('resize', () => rings.forEach((r) => r(true)));
+      const onResize = () => rings.forEach((r) => r(true));
+      window.addEventListener('resize', onResize);
+      M.onReset(() => window.removeEventListener('resize', onResize));
       form.addEventListener('change', (e) => {
         const t = e.target;
         if (t.name === 'unit' || t.id === 'rl' || t.id === 'rw') return;
