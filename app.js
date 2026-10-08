@@ -147,7 +147,7 @@
       <section class="section" style="padding-top:0" aria-labelledby="cats-t">
         <div class="wrap">
           <div class="head head--center"><h2 id="cats-t" data-brighten>Find your kind of bed.</h2><p>Every bed is made to order in the fabric and colour you choose.</p></div>
-          <div class="cats" data-stagger>${shown.map((id) => { const c = cat(id); return `<a class="cat" href="#shop-${id}"><h3>${c.name}</h3><p>${c.line}</p><span class="go">Shop</span><div class="cat__img" data-parallax><img src="${PHOTO}" alt=""></div></a>`; }).join('')}</div>
+          <div class="cats" data-stagger>${shown.map((id) => { const c = cat(id); return `<a class="cat" href="#shop-${id}"><div class="cat__img"><img src="${PHOTO}" alt=""></div><div class="cat__body"><h3>${c.short || c.name}</h3><p>${c.line}</p><span class="go">Shop</span></div></a>`; }).join('')}</div>
         </div>
       </section>
 
