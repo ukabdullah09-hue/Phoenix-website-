@@ -207,7 +207,7 @@
         tabs.forEach(([t, p]) => document.getElementById(t).addEventListener('click', () => {
           tabs.forEach(([t2, p2]) => { document.getElementById(t2).setAttribute('aria-selected', t2 === t); document.getElementById(p2).hidden = p2 !== p; });
           place();
-          M.slideIn(document.getElementById(p), t === 'tb-matt' ? 1 : -1);
+          M.fadeUp(document.getElementById(p));
         }));
       }
     };

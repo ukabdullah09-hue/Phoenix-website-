@@ -376,7 +376,7 @@ window.Motion = (() => {
       g.from(el.querySelectorAll('.star'), { opacity: 0, scale: 0.2, rotate: -40, duration: 0.5, ease: 'back.out(3)', stagger: 0.09, scrollTrigger: { trigger: el, start: 'top 94%', once: true } });
     });
 
-    if (fine) root.querySelectorAll('.card, .cat').forEach(tilt);
+    if (fine) root.querySelectorAll('.card, .cat').forEach((c) => { if (!c.closest('.rail')) tilt(c); });
 
     morphEnd(root.querySelector('#hero-figure'));
 
@@ -879,6 +879,12 @@ window.Motion = (() => {
       .to(el, { height: 0, paddingTop: 0, paddingBottom: 0, borderBottomWidth: 0, duration: 0.35, ease: 'power2.inOut' });
   }
 
+  /* Tab switch: the new items fade up together, no sideways travel or overshoot */
+  function fadeUp(el) {
+    if (!on || !el) return;
+    g.from(el.children, { y: 22, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.07, clearProps: 'transform,opacity' });
+  }
+
   function slideIn(el, dir) {
     if (!on || !el) return;
     g.from(el.children, { x: 50 * (dir || 1), opacity: 0, duration: 0.5, ease: 'power3.out', stagger: 0.05, clearProps: 'transform,opacity' });
@@ -945,5 +951,5 @@ window.Motion = (() => {
     if (on && el) g.fromTo(el, { rotate: 0 }, { rotate: 360, duration: 0.7, ease: 'back.out(1.6)' });
   }
 
-  return { on, reduce, onReset: (fn) => cleanups.push(fn), loader, intro, progress, nav, pressFx, buttons, reset, page, ring, seg, chips, flip, heart, addToBag, bump, money, flipNum, pop, fadeSwap, textSwap, flash, shake, collapse, slideIn, slideOut, morphStart, morphCancel, transition, sheet, spin, burst, burstAt, splitWords };
+  return { on, reduce, onReset: (fn) => cleanups.push(fn), fadeUp, loader, intro, progress, nav, pressFx, buttons, reset, page, ring, seg, chips, flip, heart, addToBag, bump, money, flipNum, pop, fadeSwap, textSwap, flash, shake, collapse, slideIn, slideOut, morphStart, morphCancel, transition, sheet, spin, burst, burstAt, splitWords };
 })();
