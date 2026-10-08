@@ -468,6 +468,7 @@ body.nav-hidden .filterbar { top: env(safe-area-inset-top, 0px); }
 .opt b { font-weight: 600; }
 .opt i { font-style: normal; color: var(--ink-2); font-size: 0.85rem; grid-column: 1; }
 .opt em { font-style: normal; font-size: 0.88rem; grid-row: 1; grid-column: 2; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+.opt .art--photo { aspect-ratio: 170 / 110; object-fit: contain; background: #f3ece2; border-radius: 12px; }
 .opt .art { grid-column: 1 / -1; grid-row: 1; display: block; width: 100%; max-width: 150px; height: auto; margin-bottom: 0.4rem; border-radius: 12px; }
 .opt > span > em { grid-row: auto; }
 .opt input:hover + span { box-shadow: inset 0 0 0 1px var(--ink); }

@@ -34,7 +34,9 @@ window.Art = (() => {
     'super-king': ['a', 'c', 'c', 'a']
   };
 
+  const SIZE_PHOTO = { single: 'images/size-single.png', 'small-double': 'images/size-small-double.png', king: 'images/size-king.png' };
   function size(id) {
+    if (SIZE_PHOTO[id]) return `<img class="art art--photo" src="${SIZE_PHOTO[id]}" alt="" loading="lazy" decoding="async">`;
     const people = PEOPLE[id];
     if (!people) return '';
     const top = 12, span = 86, rowH = span / people.length;
