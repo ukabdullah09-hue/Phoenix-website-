@@ -33,7 +33,8 @@
     grid3: '<rect x="3" y="3" width="5" height="5" rx="1"/><rect x="9.5" y="3" width="5" height="5" rx="1"/><rect x="16" y="3" width="5" height="5" rx="1"/><rect x="3" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><rect x="16" y="9.5" width="5" height="5" rx="1"/><rect x="3" y="16" width="5" height="5" rx="1"/><rect x="9.5" y="16" width="5" height="5" rx="1"/><rect x="16" y="16" width="5" height="5" rx="1"/>'
   };
   const icon = (n, sw) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw || 1.6}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
-  const meter = (score, cls) => `<span class="meter${cls || ''}" data-score="${score}" role="img" aria-label="Rated ${score} out of 5"><span class="meter__base" aria-hidden="true">★★★★★</span><span class="meter__fill" aria-hidden="true">★★★★★</span></span>`;
+  const meterRow = '<span class="meter__s">★</span>'.repeat(5);
+  const meter = (score, cls) => `<span class="meter${cls || ''}" data-score="${score}" role="img" aria-label="Rated ${score} out of 5"><span class="meter__base" aria-hidden="true">${meterRow}</span><span class="meter__fill" aria-hidden="true">${meterRow}</span></span>`;
 
   function rating(p) {
     const src = S.SOURCES[p.src].name;

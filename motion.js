@@ -396,9 +396,11 @@ window.Motion = (() => {
       if (!on) { fill.style.width = to + '%'; return; }
       const o = { w: 0 };
       fill.style.width = '0%';
+      const glyphs = fill.querySelectorAll('.meter__s');
       ST.create({ trigger: m, start: 'top 92%', once: true, onEnter: () => {
-        g.to(o, { w: to, duration: 1.5, ease: 'power3.out', onUpdate: () => { fill.style.width = o.w.toFixed(2) + '%'; } });
-        g.fromTo(m, { scale: 0.9 }, { scale: 1, duration: 0.9, ease: 'back.out(2)', clearProps: 'transform' });
+        g.to(o, { w: to, duration: 1.3, ease: 'power2.out', onUpdate: () => { fill.style.width = o.w.toFixed(2) + '%'; } });
+        g.fromTo(glyphs, { scale: 0.2, rotate: -50, y: 6 }, { scale: 1, rotate: 0, y: 0, duration: 0.7, ease: 'back.out(2.6)', stagger: 0.14, clearProps: 'transform' });
+        g.fromTo(m, { scale: 0.92 }, { scale: 1, duration: 1, ease: 'elastic.out(1, 0.5)', clearProps: 'transform', delay: 0.1 });
       } });
     });
   }
