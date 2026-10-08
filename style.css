@@ -80,9 +80,10 @@ h1, h2, h3 { font-weight: 600; letter-spacing: -0.015em; line-height: 1.07; text
 .wa { position: fixed; right: 18px; bottom: 22px; z-index: 44; width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer; background: #25D366; color: #fff; display: grid; place-items: center; box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35); }
 .wa svg { width: 24px; height: 24px; }
 .wa { animation: waIn 0.9s 1.4s var(--spring) both; }
+.wa:focus-visible { animation: waIn 0.9s 1.4s var(--spring) both, focusIn 0.35s var(--glide); }
 @keyframes waIn { from { scale: 0; rotate: -60deg; } }
-.wa::before { content: ""; position: absolute; inset: 0; border-radius: 50%; animation: breathe 4s ease-out infinite; }
-@keyframes breathe { 0%, 60% { box-shadow: 0 0 0 0 rgba(37, 211, 102, .5); } 85% { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+.wa::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 50%; background: rgba(37, 211, 102, .5); opacity: 0; animation: breathe 4s ease-out 3; }
+@keyframes breathe { 0%, 60% { transform: scale(1); opacity: 1; } 85% { transform: scale(1.54); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
 @media (max-width: 820px) { .wa { bottom: calc(var(--tab-h) + 14px + env(safe-area-inset-bottom, 0px)); } }
 body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
 @media (max-width: 820px) { body.has-buybar .wa { bottom: calc(var(--tab-h) + var(--buybar-h, 76px) + 14px + env(safe-area-inset-bottom, 0px)); } }
@@ -111,7 +112,7 @@ body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
   .btn:hover .lbl:not(:has(svg)) { transform: translateY(-2em); }
 }
 /* The main calls to action catch the light every few seconds */
-.btn--glint::after { animation: glint 5s 2.2s var(--glide) infinite; }
+.btn--glint::after { animation: glint 5s 2.2s var(--glide) 3; }
 @keyframes glint { 0%, 74% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
 :focus-visible { animation: focusIn 0.35s var(--glide); }
 @keyframes focusIn { from { outline-offset: 9px; outline-color: transparent; } }
@@ -151,7 +152,7 @@ body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
 @keyframes imgIn { from { opacity: 0; } }
 .fly, .morph { position: fixed; z-index: 75; object-fit: cover; pointer-events: none; }
 .fly { width: 84px; height: 84px; left: 0; top: 0; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
-.morph { border-radius: 18px; box-shadow: 0 24px 60px rgba(0, 0, 0, .18); }
+.morph { z-index: 41; border-radius: 18px; box-shadow: 0 24px 60px rgba(0, 0, 0, .18); }
 
 .toast { position: fixed; left: 50%; top: calc(var(--nav-h) + 12px); z-index: 60; overflow: hidden; width: max-content; max-width: calc(100vw - 32px); transform: translateX(-50%); background: var(--ink); color: #fff; padding: 0.65rem 1.15rem; border-radius: 980px; font-size: 0.9rem; white-space: nowrap; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); animation: toastIn 0.55s var(--spring) both; }
 .toast::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(255, 255, 255, .5); transform-origin: left; animation: toastBar 2.3s linear forwards; }
@@ -163,7 +164,7 @@ body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
 .hero-intro h1 { font-size: clamp(2.6rem, 7vw, 5.4rem); letter-spacing: -0.03em; max-width: 13ch; line-height: 1.02; }
 .hero-intro .sub { font-size: clamp(1.1rem, 2.4vw, 1.7rem); color: var(--ink-2); }
 .hero-pill { position: relative; overflow: hidden; isolation: isolate; display: inline-block; font-size: 0.83rem; font-weight: 500; letter-spacing: 0.01em; color: var(--ink-2); background: var(--mist-2); border-radius: 100px; padding: 0.3rem 0.85rem; margin-top: -0.2rem; }
-.hero-pill::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .9) 50%, transparent 70%); transform: translateX(-120%); animation: glint 6s 3s ease-in-out infinite; }
+.hero-pill::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .9) 50%, transparent 70%); transform: translateX(-120%); animation: glint 6s 3s ease-in-out 3; }
 .w { display: inline-block; }
 
 .strip-wrap { justify-self: stretch; margin-inline: calc(-1 * var(--gutter)); margin-top: clamp(1.25rem, 3vw, 2rem); display: grid; gap: 0.4rem; }
@@ -188,10 +189,12 @@ body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
 .zoom-slide .zoom__frame img { width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 45%; }
 /* The bed on screen pushes in slowly; when you swipe away it eases back out */
 .zoom-slide.is-active .zoom__frame { scale: 1.08; transition: scale 9s cubic-bezier(.25, .1, .25, 1); }
-.zoom-slide .zoom__cap { position: absolute; left: 0; right: 0; bottom: 0; padding: clamp(1.5rem, 5vw, 3.5rem); color: #fff; background: linear-gradient(to top, rgba(0,0,0,.55), transparent); display: grid; gap: 0.3rem; opacity: var(--cap, 1); }
+.zoom-slide .zoom__cap { position: absolute; left: 0; right: 0; bottom: 0; padding: clamp(1.5rem, 5vw, 3.5rem) max(clamp(1.5rem, 5vw, 3.5rem), env(safe-area-inset-right, 0px)) clamp(1.5rem, 5vw, 3.5rem) max(clamp(1.5rem, 5vw, 3.5rem), env(safe-area-inset-left, 0px)); color: #fff; background: linear-gradient(to top, rgba(0,0,0,.55), transparent); display: grid; gap: 0.3rem; opacity: var(--cap, 1); }
 /* Leaves room so the dots' enlarged tap area never overlaps the caption button */
-@media (max-width: 820px) { .zoom-slide .zoom__cap { padding-bottom: calc(var(--tab-h) + 3rem); } }
+@media (max-width: 820px) { .zoom-slide .zoom__cap { padding-bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 3rem); } }
 .zoom-slide .zoom__cap .btn--fill { background: #fff; color: var(--ink); }
+/* Keyboard focus on a caption that is still fading in must show it */
+.zoom:has(:focus-visible) { --cap: 1 !important; }
 .zoom__go { justify-self: start; margin-top: 0.6rem; }
 @media (hover: hover) { .zoom-slide .zoom__cap .btn--fill:hover { background: #e8e8ed; } }
 /* Each slide's words rise in one after another as it arrives */
@@ -200,11 +203,14 @@ body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
 .zoom-slide .zoom__cap > :nth-child(3) { transition-delay: 0.16s; }
 .zoom.is-ready .zoom-slide:not(.is-active) .zoom__cap > * { opacity: 0; translate: 0 24px; transition-duration: 0.25s; transition-delay: 0s; }
 /* Dot indicators: the active one fills like a timer, and the carousel moves on when it is full */
-.zoom-dots { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.45rem; z-index: 5; opacity: var(--cap, 1); }
-@media (max-width: 820px) { .zoom-dots { bottom: calc(var(--tab-h) + 0.9rem); } }
+.zoom-dots { position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; z-index: 5; opacity: var(--cap, 1); }
+@media (max-width: 820px) { .zoom-dots { bottom: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px) + 0.9rem); } }
 .zoom-dot { position: relative; width: 8px; height: 8px; border-radius: 4px; background: rgba(255,255,255,.45); border: 0; padding: 0; cursor: pointer; transition: width 0.45s var(--spring), background 0.3s ease; }
 /* A bigger invisible target than the 8px dot */
-.zoom-dot::before { content: ""; position: absolute; inset: -18px -6px; }
+.zoom-dot::before { content: ""; position: absolute; inset: -18px -8px; }
+.zoom-pause { width: 26px; height: 26px; border: 0; border-radius: 50%; padding: 0; background: rgba(0,0,0,.28); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff; font-size: 8px; line-height: 1; letter-spacing: 1px; cursor: pointer; }
+.zoom-pause::before { content: "\275A\275A"; }
+.zoom-pause[aria-pressed="true"]::before { content: "\25B6"; letter-spacing: 0; margin-left: 2px; }
 .zoom-dot[aria-current="true"] { width: 26px; background: #fff; }
 .zoom-dot i { position: absolute; inset: 0; border-radius: inherit; background: #fff; transform: scaleX(0); transform-origin: left; display: none; }
 .zoom.is-auto .zoom-dot[aria-current="true"] { background: rgba(255,255,255,.45); }
@@ -214,8 +220,8 @@ body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
 @media (hover: hover) { .zoom-arrow:hover { background: rgba(0,0,0,.44); } }
 .zoom.cap-off :is(.zoom__cap, .zoom-dots, .zoom-arrow) { pointer-events: none; }
 .zoom-arrow svg { width: 20px; height: 20px; }
-.zoom-arrow--prev { left: var(--gutter); }
-.zoom-arrow--next { right: var(--gutter); }
+.zoom-arrow--prev { left: max(var(--gutter), env(safe-area-inset-left, 0px)); }
+.zoom-arrow--next { right: max(var(--gutter), env(safe-area-inset-right, 0px)); }
 @media (max-width: 600px) { .zoom-arrow { display: none; } }
 /* Legacy single-frame zoom (non-carousel) — keep for other pages */
 .zoom__frame { position: absolute; inset: 0; margin: 0; overflow: hidden; clip-path: inset(0 var(--gutter) round 24px); }
@@ -297,7 +303,7 @@ body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
 @media (min-width: 900px) { .steps-line { display: block; position: absolute; left: 3rem; right: 3rem; top: 3.1rem; height: 2px; background: var(--ink); transform-origin: left center; z-index: 2; pointer-events: none; } }
 
 .story { background: var(--ink); color: #fff; }
-.story__inner { display: grid; gap: 2rem; padding: clamp(3.5rem, 8vw, 6rem) var(--gutter); max-width: 1200px; margin-inline: auto; }
+.story__inner { display: grid; gap: 2rem; padding: clamp(3.5rem, 8vw, 6rem) max(var(--gutter), env(safe-area-inset-right, 0px)) clamp(3.5rem, 8vw, 6rem) max(var(--gutter), env(safe-area-inset-left, 0px)); max-width: 1200px; margin-inline: auto; }
 @media (min-width: 900px) { .story__inner { grid-template-columns: 1.1fr 1fr; align-items: center; min-height: 100svh; } }
 .story__media { position: relative; aspect-ratio: 4 / 4.2; border-radius: var(--r); overflow: hidden; }
 .story__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }

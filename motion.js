@@ -40,7 +40,7 @@ window.Motion = (() => {
     g.timeline()
       .from(word.children, { yPercent: 110, duration: 0.5, ease: 'power4.out', stagger: 0.025 })
       .to(el, { yPercent: -100, duration: 0.7, ease: 'power4.inOut', delay: 0.2, onComplete: () => el.remove() });
-    heroDelay = 0.95;
+    heroDelay = 1.35;
     return heroDelay;
   }
 
@@ -134,10 +134,7 @@ window.Motion = (() => {
   const TIP = '.cat, .card, .strip__thumb';
 
   function pressFx() {
-    document.addEventListener('pointerdown', (e) => {
-      if (e.button > 0) return;
-      const el = e.target.closest(PRESSABLE);
-      if (!el || el.closest('[disabled]')) return;
+    const start = (e, el, released) => {
       tapRing(e.clientX, e.clientY, el);
       if (el.matches('.btn--fill') && !el.closest('.buybar')) burst(e.clientX, e.clientY, { n: 8, dist: 30 });
       if (!on) return;
@@ -149,7 +146,7 @@ window.Motion = (() => {
       const tipped = e.pointerType !== 'mouse' && t.matches(TIP);
       let press = { scale: amt };
       if (t.matches(SQUISH)) {
-        press = { scaleX: 1 - (1 - amt) * 0.55, scaleY: 1 - (1 - amt) * 1.35 };
+        press = { scaleX: 1 + (1 - amt) * 0.35, scaleY: 1 - (1 - amt) * 1.1 };
       } else if (tipped) {
         const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
         t.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
@@ -158,19 +155,35 @@ window.Motion = (() => {
       }
       t.classList.add('is-pressed');
       g.to(t, Object.assign(press, { duration: 0.14, ease: 'power2.out', overwrite: 'auto' }));
-      const release = () => {
+      const release = (cancelled) => {
+        window.removeEventListener('pointerup', up);
+        window.removeEventListener('pointercancel', cancel);
         t.classList.remove('is-pressed');
         const back = { scaleX: 1, scaleY: 1, rotation: 0, duration: 0.9, ease: 'elastic.out(1.1, 0.32)', overwrite: 'auto' };
         if (tipped) Object.assign(back, { rotationX: 0, rotationY: 0, ease: 'elastic.out(1, 0.42)' });
+        if (cancelled) Object.assign(back, { duration: 0.3, ease: 'power3.out' });
         g.to(t, back);
-        window.removeEventListener('pointerup', release);
-        window.removeEventListener('pointercancel', release);
       };
-      window.addEventListener('pointerup', release);
-      window.addEventListener('pointercancel', release);
+      const up = () => release(false);
+      const cancel = () => release(true);
+      if (released) setTimeout(up, 120);
+      else { window.addEventListener('pointerup', up); window.addEventListener('pointercancel', cancel); }
       const tab = el.closest('.tabbar a');
       // Web Animations, not GSAP: GSAP measures a bare <svg> by moving it in the DOM and puts it back after the label
       if (tab) tab.querySelector('svg').animate([{ transform: 'none' }, { transform: 'translateY(-7px)' }, { transform: 'none' }], { duration: 320, easing: 'ease-out' });
+    };
+    document.addEventListener('pointerdown', (e) => {
+      if (e.button > 0) return;
+      const el = e.target.closest(PRESSABLE);
+      if (!el || el.closest('[disabled]')) return;
+      if (e.pointerType !== 'touch') return start(e, el, false);
+      let done = false;
+      const wait = setTimeout(() => { done = true; start(e, el, false); }, 90);
+      const cleanup = () => { window.removeEventListener('pointerup', onUp); window.removeEventListener('pointercancel', onCancel); };
+      const onUp = () => { cleanup(); if (!done) { done = true; clearTimeout(wait); start(e, el, true); } };
+      const onCancel = () => { cleanup(); clearTimeout(wait); };
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onCancel);
     }, { passive: true });
   }
 
@@ -431,7 +444,7 @@ window.Motion = (() => {
   function unspring(el) {
     const s = springs.get(el);
     if (!s) return;
-    el.style.translate = '';
+    el.style.translate = ''; el.style.willChange = '';
     springs.delete(el);
   }
 
@@ -440,7 +453,7 @@ window.Motion = (() => {
     if (!s || !s.moved) return;
     s.x = s.vx = s.y = s.vy = 0;
     s.moved = false;
-    el.style.translate = '';
+    el.style.translate = ''; el.style.willChange = '';
   }
 
   function kick() {
@@ -481,7 +494,7 @@ window.Motion = (() => {
 
   // Before a FLIP layout change: measure without any spring offset
   function springSettle() {
-    springs.forEach((s, el) => { s.x = s.vx = s.y = s.vy = 0; s.moved = false; el.style.translate = ''; });
+    springs.forEach((s, el) => { s.x = s.vx = s.y = s.vy = 0; s.moved = false; el.style.translate = ''; el.style.willChange = ''; });
   }
 
   function springStep(now) {
@@ -509,7 +522,7 @@ window.Motion = (() => {
       }
       if (g.isTweening(el)) {
         // A reveal ending with clearProps folds any live `translate` into GSAP's transform for good
-        if (s.moved) { s.x = s.vx = s.y = s.vy = 0; s.moved = false; el.style.translate = ''; }
+        if (s.moved) { s.x = s.vx = s.y = s.vy = 0; s.moved = false; el.style.translate = ''; el.style.willChange = ''; }
         return;
       }
       reads.push([el, s, el.getBoundingClientRect(), dx]);
@@ -517,17 +530,19 @@ window.Motion = (() => {
     let live = false;
     reads.forEach(([el, s, r, dx]) => {
       const cy = r.top + r.height / 2 - s.y, cx = r.left + r.width / 2 - s.x;
-      if (dy) s.y += dy * LAG * Math.min(1, Math.abs(cy - finger.y) / (vh * 0.6));
-      if (dx) s.x += dx * LAG * Math.min(1, Math.abs(cx - finger.x) / (vw * 0.6));
+      const fy = Math.min(1, Math.abs(cy - finger.y) / (vh * 0.6)), fx = Math.min(1, Math.abs(cx - finger.x) / (vw * 0.6));
+      if (dy) s.y += dy * LAG * fy;
+      if (dx) s.x += dx * LAG * fx;
       s.vy += (-K * s.y - DAMP * s.vy) * dt; s.y += s.vy * dt;
       s.vx += (-K * s.x - DAMP * s.vx) * dt; s.x += s.vx * dt;
-      const my = Math.min(16, r.height * 0.07), mx = Math.min(22, r.width * 0.08);
+      const my = Math.min(10, r.height * 0.05) * fy + 0.5, mx = Math.min(12, r.width * 0.05) * fx + 0.5;
       if (Math.abs(s.y) > my) { s.y = Math.sign(s.y) * my; s.vy = 0; }
       if (Math.abs(s.x) > mx) { s.x = Math.sign(s.x) * mx; s.vx = 0; }
       if (Math.abs(s.y) < 0.1 && Math.abs(s.vy) < 3 && Math.abs(s.x) < 0.1 && Math.abs(s.vx) < 3) {
         s.x = s.vx = s.y = s.vy = 0;
-        if (s.moved) { el.style.translate = ''; s.moved = false; }
+        if (s.moved) { el.style.translate = ''; el.style.willChange = ''; s.moved = false; }
       } else {
+        if (!s.moved) el.style.willChange = 'translate';
         el.style.translate = `${s.x.toFixed(2)}px ${s.y.toFixed(2)}px`;
         s.moved = true;
         live = true;
@@ -571,13 +586,13 @@ window.Motion = (() => {
     const slides = [...track.children];
     const dots = [...zoom.querySelectorAll('.zoom-dot')];
     const auto = !reduce && !!Element.prototype.animate;
-    const hold = { touch: false, off: false, hover: false, focus: false };
+    const hold = { user: false, touch: false, off: false, hover: false, focus: false };
     let idx = -1, fill = null;
     const width = () => Math.max(1, track.clientWidth);
     const slideTo = (i) => track.scrollTo({ left: i * width(), behavior: reduce ? 'auto' : 'smooth' });
     const sync = () => {
       if (!fill) return;
-      const wait = hold.touch || hold.off || hold.hover || hold.focus || document.hidden;
+      const wait = hold.user || hold.touch || hold.off || hold.hover || hold.focus || document.hidden;
       if (wait && fill.playState === 'running') fill.pause();
       else if (!wait && fill.playState === 'paused') fill.play();
     };
@@ -619,7 +634,15 @@ window.Motion = (() => {
       ST.addEventListener('refresh', keep);
       cleanups.push(() => ST.removeEventListener('refresh', keep));
     }
+    const pause = zoom.querySelector('.zoom-pause');
+    if (pause) pause.hidden = !auto;
     if (!auto) return;
+    if (pause) pause.addEventListener('click', () => {
+      hold.user = !hold.user;
+      pause.setAttribute('aria-pressed', hold.user);
+      pause.setAttribute('aria-label', hold.user ? 'Play slideshow' : 'Pause slideshow');
+      sync();
+    });
     track.addEventListener('touchstart', () => { hold.touch = true; sync(); }, { passive: true });
     const letGo = () => { hold.touch = false; startFill(); };
     track.addEventListener('touchend', letGo, { passive: true });

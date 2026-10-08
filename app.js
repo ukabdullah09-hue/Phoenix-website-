@@ -134,7 +134,7 @@
 
       <section class="zoom" aria-label="Featured beds">
         <div class="zoom-track" id="zoom-track">${SLIDES.map((s, i) => `<div class="zoom-slide"><figure class="zoom__frame"><img src="${PHOTO}" alt="${ALT}" style="object-position:${s.pos}"${i === 0 ? ' fetchpriority="high"' : ''}></figure><div class="zoom__cap"><h2>${s.h2}</h2><p>${s.sub}</p><div class="zoom__go"><a class="btn btn--fill" href="#bed-${s.id}"><span class="lbl">Shop ${s.h2.replace(' Bed.','')}</span></a></div></div></div>`).join('')}</div>
-        <div class="zoom-dots" id="zoom-dots" role="group" aria-label="Featured beds">${SLIDES.map((s,i)=>`<button class="zoom-dot" type="button" aria-label="${s.h2.replace('.','')} — slide ${i+1}" aria-current="${i===0}"><i aria-hidden="true"></i></button>`).join('')}</div>
+        <div class="zoom-dots" id="zoom-dots" role="group" aria-label="Featured beds">${SLIDES.map((s,i)=>`<button class="zoom-dot" type="button" aria-label="${s.h2.replace('.','')} — slide ${i+1}" aria-current="${i===0}"><i aria-hidden="true"></i></button>`).join('')}<button class="zoom-pause" type="button" aria-label="Pause slideshow" aria-pressed="false"></button></div>
         <button class="zoom-arrow zoom-arrow--prev" type="button" aria-label="Previous bed" id="zoom-prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button>
         <button class="zoom-arrow zoom-arrow--next" type="button" aria-label="Next bed" id="zoom-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
       </section>
@@ -763,7 +763,7 @@
       document.title = out.title;
       document.body.classList.toggle('has-buybar', !!out.buybar);
       markNav(hash, tab);
-      if (!quiet) window.scrollTo(0, 0);
+      if (!quiet) { window.scrollTo(0, 0); if (window.ScrollTrigger) window.ScrollTrigger.getScrollFunc(window)(0); }
       if (out.after) out.after();
       const bar = document.getElementById('buybar');
       if (bar) document.body.style.setProperty('--buybar-h', bar.offsetHeight + 'px');
