@@ -1,6 +1,6 @@
 /* Warm line-and-tone illustrations for the bed configurator. One tile per option, same size and palette throughout. */
 window.Art = (() => {
-  const BG = '#f3ece2', WOOD = '#cdb493', WOOD_D = '#a88b66', FOAM = '#fbf7f0', DRAWER = '#e6d6bd', LINE = '#5b4a3a', INK = '#3b2f25', SHADOW = '#8a7560';
+  const BG = '#f5f5f7', WOOD = '#e8e8ed', WOOD_D = '#c7c7cc', FOAM = '#ffffff', DRAWER = '#f0f0f3', LINE = '#1d1d1f', INK = '#1d1d1f', SHADOW = '#aeaeb2', GOLD = '#c9a227';
   const tile = (body) => `<svg class="art" viewBox="0 0 170 110" aria-hidden="true" focusable="false"><rect width="170" height="110" rx="14" fill="${BG}"/>${body}</svg>`;
   const shape = (tag, attrs) => `<${tag} ${attrs} stroke="${LINE}" stroke-width="2" stroke-linejoin="round"/>`;
   const dash = (d, w) => `<path d="${d}" fill="none" stroke="${LINE}" stroke-width="${w || 1.6}" stroke-linecap="round" stroke-dasharray="3 4"/>`;
@@ -70,12 +70,12 @@ window.Art = (() => {
     underbed: () => shape('rect', `x="26" y="66" width="126" height="18" rx="4" fill="${WOOD_D}"`),
     drawers: () => {
       let s = shape('rect', `x="30" y="69" width="54" height="13" rx="3" fill="${DRAWER}"`) + shape('rect', `x="90" y="69" width="54" height="13" rx="3" fill="${DRAWER}"`);
-      s += line('M54 75.5H62', 2.4) + line('M114 75.5H122', 2.4);
+      s += `<path d="M54 75.5H62M114 75.5H122" fill="none" stroke="${GOLD}" stroke-width="2.4" stroke-linecap="round"/>`;
       return s;
     },
     gaslift: () => {
       let s = shape('rect', `x="30" y="60" width="118" height="5" rx="2" fill="${SHADOW}"`);
-      s += line('M40 84L72 56', 3);
+      s += `<path d="M40 84L72 56" fill="none" stroke="${GOLD}" stroke-width="3" stroke-linecap="round"/>`;
       s += line('M140 62V44M134 50L140 44L146 50', 2.2);
       return s;
     }
