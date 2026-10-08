@@ -114,7 +114,12 @@
   function home() {
     const ember = S.product('ember');
     const shown = ['gaslift', 'luxury', 'premium', 'storage', 'kids', 'mattresses'];
-    const strip = byPop(S.PRODUCTS).map((p) => `<a class="strip__item" href="#bed-${p.id}"><span class="strip__thumb"><img src="${PHOTO}" alt=""></span><span class="strip__name">${esc(p.name)}</span><span class="strip__price">From ${money(p.min)}</span></a>`).join('');
+    const SLIDES = [
+      { id: 'ember',       h2: 'Ember Bed.',       sub: `Tall panels, from ${money(ember.min)}.`,     pos: '50% 40%' },
+      { id: 'ambassador',  h2: 'Ambassador Bed.',  sub: 'Grand curves. Regal presence.',              pos: '30% 25%' },
+      { id: 'pearl',       h2: 'Pearl Bed.',        sub: 'Timeless elegance, made to order.',         pos: '65% 60%' },
+      { id: 'isla',        h2: 'Isla Bed.',         sub: 'Soft lines. Every colour imaginable.',      pos: '50% 80%' }
+    ];
     return {
       name: 'home',
       title: 'Phoenix Beds',
@@ -123,12 +128,13 @@
         <h1 id="hero-t" data-hero-title>Beds made to order in Dewsbury.</h1>
         <p class="sub" data-hero-after>Your size. Your fabric. Your colour.</p>
         <div class="actions" data-hero-after><a class="btn btn--fill" href="#shop"><span class="lbl">Shop all beds</span></a><a class="btn btn--line" href="#finder"><span class="lbl">Find my bed</span></a></div>
-        <div class="strip-wrap"><nav class="strip" data-strip aria-label="Every bed">${strip}<a class="strip__item strip__all" href="#shop"><span class="strip__thumb">${icon('grid', 1.4)}</span><span class="strip__name">All beds</span><span class="strip__price">${S.PRODUCTS.length} designs</span></a></nav></div>
       </section>
 
-      <section class="zoom" aria-label="Featured bed">
-        <figure class="zoom__frame"><img src="${PHOTO}" alt="${ALT}"></figure>
-        <div class="zoom__cap"><h2>Ember Bed.</h2><p>Tall panels, from ${money(ember.min)}.</p><a class="btn btn--fill" href="#bed-ember"><span class="lbl">Buy Ember</span></a></div>
+      <section class="zoom" aria-label="Featured beds">
+        <div class="zoom-track" id="zoom-track">${SLIDES.map((s, i) => `<div class="zoom-slide"><figure class="zoom__frame"><img src="${PHOTO}" alt="${ALT}" style="object-position:${s.pos}"></figure><div class="zoom__cap"><h2>${s.h2}</h2><p>${s.sub}</p><a class="btn btn--fill" href="#bed-${s.id}"><span class="lbl">Shop ${s.h2.replace(' Bed.','')}</span></a></div></div>`).join('')}</div>
+        <div class="zoom-dots" id="zoom-dots" role="group" aria-label="Featured beds">${SLIDES.map((s,i)=>`<button class="zoom-dot" type="button" aria-label="${s.h2.replace('.','')} — slide ${i+1}" aria-selected="${i===0}"></button>`).join('')}</div>
+        <button class="zoom-arrow zoom-arrow--prev" type="button" aria-label="Previous bed" id="zoom-prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="zoom-arrow zoom-arrow--next" type="button" aria-label="Next bed" id="zoom-next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
       </section>
 
       <section class="section"><div class="wrap"><div class="promises" data-stagger>
@@ -204,6 +210,26 @@
           place();
           M.slideIn(document.getElementById(p), t === 'tb-matt' ? 1 : -1);
         }));
+
+        // Hero carousel
+        const track = document.getElementById('zoom-track');
+        const dotsEl = document.getElementById('zoom-dots');
+        if (!track || !dotsEl) return;
+        const slides = [...track.children];
+        const dots = [...dotsEl.children];
+        const slideTo = (i) => track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+        const curIdx = () => Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+        const syncDots = () => { const i = curIdx(); dots.forEach((d, j) => d.setAttribute('aria-selected', j === i)); };
+        let scrollEndT = 0;
+        track.addEventListener('scroll', () => { clearTimeout(scrollEndT); scrollEndT = setTimeout(syncDots, 80); }, { passive: true });
+        dots.forEach((d, i) => d.addEventListener('click', () => { M.pressFx(d); slideTo(i); }));
+        document.getElementById('zoom-prev')?.addEventListener('click', (e) => { M.pressFx(e.currentTarget); slideTo(Math.max(0, curIdx() - 1)); });
+        document.getElementById('zoom-next')?.addEventListener('click', (e) => { M.pressFx(e.currentTarget); slideTo(Math.min(slides.length - 1, curIdx() + 1)); });
+        // Auto-advance every 6s; pause on touch
+        let autoT = setInterval(() => slideTo((curIdx() + 1) % slides.length), 6000);
+        const pauseAuto = () => { clearInterval(autoT); autoT = setInterval(() => slideTo((curIdx() + 1) % slides.length), 6000); };
+        track.addEventListener('touchstart', pauseAuto, { passive: true });
+        track.addEventListener('mousedown', pauseAuto, { passive: true });
       }
     };
   }
