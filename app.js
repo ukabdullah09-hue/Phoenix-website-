@@ -127,6 +127,7 @@
       <section class="hero-intro" aria-labelledby="hero-t">
         <h1 id="hero-t" data-hero-title>Beds made to order in Dewsbury.</h1>
         <p class="sub" data-hero-after>Your size. Your fabric. Your colour.</p>
+        <span class="hero-pill" data-hero-after>From £240 · Handmade in Dewsbury</span>
         <div class="actions" data-hero-after><a class="btn btn--fill" href="#shop"><span class="lbl">Shop all beds</span></a><a class="btn btn--line" href="#finder"><span class="lbl">Find my bed</span></a></div>
       </section>
 
@@ -189,15 +190,12 @@
         <div class="actions"><a class="btn btn--fill" href="#finder"><span class="lbl">Start the bed finder</span></a></div>
       </section>
 
-      <section class="section" aria-labelledby="homes-t">
-        <div class="wrap">
-          <div class="head head--center"><h2 id="homes-t" data-brighten>In customers' homes.</h2><p>Real bedrooms, real beds.</p></div>
-          <div class="homes">
-            <figure data-parallax><img src="${PHOTO}" alt="${ALT}"><figcaption>Customer photo to be supplied</figcaption></figure>
-            <figure class="quote"><span class="stars" aria-label="5 out of 5 stars">★★★★★</span><blockquote>“${esc(S.REVIEWS[0].text)}”</blockquote><footer>${esc(S.REVIEWS[0].name)} · Isla Bed · ${S.REVIEWS[0].date}<br>Review left on Cool &amp; Comfy</footer></figure>
-          </div>
+      <section class=”section” aria-labelledby=”homes-t”>
+        <div class=”wrap”>
+          <div class=”head head--center”><h2 id=”homes-t” data-brighten>What customers say.</h2><p>Reviews labelled by source (UK DMCC Act 2024).</p></div>
+          ${reviewCards(S.REVIEWS)}
           ${scores()}
-          <p style="text-align:center;margin-top:1.5rem"><a class="link" href="#reviews">Read all reviews</a></p>
+          <p style=”text-align:center;margin-top:1.5rem”><a class=”link” href=”#reviews”>Read all reviews</a></p>
         </div>
       </section>
 
