@@ -1,10 +1,11 @@
 /* Product option pictures: the photos supplied for each option. Options without a supplied picture show none. */
 window.Art = (() => {
   const PHOTOS = {
-    size: { single: 'images/size-single.png', 'small-double': 'images/size-small-double.png', king: 'images/size-king.png' },
+    size: { single: 'images/size-single.png', 'small-double': 'images/size-small-double.png', double: 'images/size-double.png', king: 'images/size-king.png', 'super-king': 'images/size-super-king.png' },
     height: { '54': 'images/headboard-54.png', '60': 'images/headboard-60.png', '75': 'images/headboard-75.png', '80': 'images/headboard-80.png' },
     storage: { standard: 'images/storage-standard.png', underbed: 'images/storage-underbed.png', drawers: 'images/storage-drawers.png', gaslift: 'images/storage-gaslift.png' },
-    mattress: { matching: 'images/mattress-matching.png' }
+    mattress: { matching: 'images/mattress-matching.png' },
+    box: { matching: 'images/box-matching.png', none: 'images/box-none.png' }
   };
   const photo = (group, id) => {
     const src = (PHOTOS[group] || {})[id];
@@ -15,6 +16,6 @@ window.Art = (() => {
     height: (id) => photo('height', id),
     storage: (id) => photo('storage', id),
     mattress: (id) => photo('mattress', id),
-    box: () => ''
+    box: (id) => photo('box', id)
   };
 })();
