@@ -27,22 +27,198 @@ window.Motion = (() => {
     return el.querySelectorAll('.w');
   }
 
-  /* ── First-load intro: the wordmark rises, a line fills, the curtain lifts ── */
+  /* ── Intro sound: a rising whoosh, then a warm strike as the name lands, then a shimmer that fades.
+     Synthesised with the Web Audio API, so there is no sound file to download. Browsers keep sound
+     switched off until someone has tapped the page, so on a first visit this stays silent and the mute
+     button never appears. ── */
+  const MUTE_KEY = 'pbf-introsound';
+  function introSound(plan) {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    let off = false;
+    try { off = localStorage.getItem(MUTE_KEY) === 'off'; } catch (e) { /* storage unavailable */ }
+    if (!Ctx || off || reduce) return;
+    let ctx;
+    try { ctx = new Ctx(); } catch (e) { return; }
+    const done = () => { try { ctx.close(); } catch (e) { /* already closed */ } };
+    const give = () => { done(); };
+    let settled = false;
+    const build = () => {
+      if (settled || ctx.state !== 'running') { give(); return; }
+      settled = true;
+      const t0 = ctx.currentTime + 0.02;
+      const master = ctx.createGain();
+      master.gain.value = 0.9;
+      master.connect(ctx.destination);
+
+      // Rising whoosh: filtered noise climbing while the embers gather
+      const len = Math.floor(ctx.sampleRate * 2.2);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.6;
+      const noise = ctx.createBufferSource();
+      noise.buffer = buf;
+      const band = ctx.createBiquadFilter();
+      band.type = 'bandpass';
+      band.Q.value = 1.1;
+      band.frequency.setValueAtTime(160, t0);
+      band.frequency.exponentialRampToValueAtTime(2200, t0 + plan.strike);
+      band.frequency.exponentialRampToValueAtTime(500, t0 + plan.strike + 0.9);
+      const ng = ctx.createGain();
+      ng.gain.setValueAtTime(0.0001, t0);
+      ng.gain.exponentialRampToValueAtTime(0.085, t0 + plan.strike - 0.05);
+      ng.gain.exponentialRampToValueAtTime(0.0001, t0 + plan.strike + 1.1);
+      noise.connect(band).connect(ng).connect(master);
+      noise.start(t0);
+      noise.stop(t0 + 2.2);
+
+      // The strike as the name lands: a soft low boom under a warm chord
+      const ts = t0 + plan.strike;
+      const boom = ctx.createOscillator();
+      boom.type = 'sine';
+      boom.frequency.setValueAtTime(120, ts);
+      boom.frequency.exponentialRampToValueAtTime(48, ts + 0.7);
+      const bg = ctx.createGain();
+      bg.gain.setValueAtTime(0.0001, ts);
+      bg.gain.exponentialRampToValueAtTime(0.16, ts + 0.04);
+      bg.gain.exponentialRampToValueAtTime(0.0001, ts + 1.2);
+      boom.connect(bg).connect(master);
+      boom.start(ts);
+      boom.stop(ts + 1.3);
+
+      [523.25, 784, 1046.5, 1568].forEach((f, i) => {
+        const o = ctx.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = f;
+        const gn = ctx.createGain();
+        gn.gain.setValueAtTime(0.0001, ts);
+        gn.gain.exponentialRampToValueAtTime(0.05 / (i + 1.2), ts + 0.05 + i * 0.02);
+        gn.gain.exponentialRampToValueAtTime(0.0001, ts + 1.6 + i * 0.2);
+        o.connect(gn).connect(master);
+        o.start(ts);
+        o.stop(ts + 2);
+      });
+
+      // Mute control, shown only while there is something to mute
+      const btn = document.getElementById('mutebtn');
+      if (btn) {
+        btn.hidden = false;
+        const set = (quiet) => {
+          master.gain.setTargetAtTime(quiet ? 0 : 0.9, ctx.currentTime, 0.05);
+          btn.classList.toggle('is-off', quiet);
+          btn.setAttribute('aria-label', quiet ? 'Turn intro sound on' : 'Turn intro sound off');
+          try { localStorage.setItem(MUTE_KEY, quiet ? 'off' : 'on'); } catch (e) { /* storage unavailable */ }
+        };
+        btn.onclick = () => set(!btn.classList.contains('is-off'));
+        setTimeout(() => { btn.hidden = true; btn.onclick = null; }, (plan.strike + 2.2) * 1000);
+      }
+      setTimeout(done, (plan.strike + 2.6) * 1000);
+    };
+    const r = ctx.resume();
+    if (r && r.then) r.then(build, give); else build();
+    setTimeout(() => { if (!settled) give(); }, 900);
+  }
+
+  /* ── First-load intro: embers drift up out of the dark, gather, and the name strikes through them in
+     brushed metal before the curtain lifts off the page. Inspired by a logo reveal Usman sent. ── */
   function loader() {
     const el = document.getElementById('loader');
     if (!el) return 0;
     if (!on) return 0;
     el.style.animation = 'none';
     const word = el.querySelector('.loader__word');
+    const sub = el.querySelector('.loader__sub');
     const text = word.textContent;
     word.setAttribute('aria-label', text);
-    word.innerHTML = [...text].map((ch) => `<span aria-hidden="true">${ch === ' ' ? ' ' : escText(ch)}</span>`).join('');
-    g.timeline()
-      .fromTo(word.children, { yPercent: 70, opacity: 0, filter: 'blur(10px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', stagger: 0.035 }, 0.1)
-      .fromTo(word, { letterSpacing: '0.45em' }, { letterSpacing: '-0.03em', duration: 1.4, ease: 'expo.out' }, 0.1)
-      .to(el, { clipPath: 'inset(0% 0% 100% 0%)', duration: 1.1, ease: 'expo.inOut', delay: 0.2, onComplete: () => el.remove() });
-    heroDelay = 1.5;
+    word.innerHTML = [...text].map((ch) => `<span aria-hidden="true">${ch === ' ' ? '&nbsp;' : escText(ch)}</span>`).join('');
+    const letters = word.children;
+    const STRIKE = 1.5, END = 2.55;
+    const stopFx = embers(el.querySelector('.loader__fx'), STRIKE);
+    introSound({ strike: STRIKE });
+
+    g.timeline({ onComplete: () => { stopFx(); el.remove(); } })
+      .fromTo(letters, { yPercent: 60, opacity: 0, filter: 'blur(16px)', scale: 1.3 },
+        { yPercent: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 1.1, ease: 'expo.out', stagger: 0.035 }, STRIKE - 0.75)
+      .fromTo(word, { letterSpacing: '0.5em' }, { letterSpacing: '-0.02em', duration: 1.5, ease: 'expo.out' }, STRIKE - 0.75)
+      // The glint travels across the name: each letter sweeps its own sheen, a beat after the one before
+      .fromTo(letters, { backgroundPosition: '110% 0' }, { backgroundPosition: '-70% 0', duration: 1, ease: 'power2.inOut', stagger: 0.045 }, STRIKE + 0.1)
+      .fromTo(sub, { opacity: 0, y: 14, letterSpacing: '0.5em' }, { opacity: 1, y: 0, letterSpacing: '0.3em', duration: 1, ease: 'power3.out' }, STRIKE + 0.25)
+      .to([word, sub], { opacity: 0, y: -16, duration: 0.5, ease: 'power2.in' }, END - 0.1)
+      .to(el, { clipPath: 'inset(0% 0% 100% 0%)', duration: 1, ease: 'expo.inOut' }, END);
+
+    heroDelay = END + 0.55;
     return heroDelay;
+  }
+
+  /* Embers: warm sparks lift out of the dark, gather toward the name, then scatter when it lands. */
+  function embers(cv, strike) {
+    if (!cv) return () => {};
+    const c = cv.getContext && cv.getContext('2d');
+    if (!c) return () => {};
+    let w = 0, h = 0, dpr = 1, raf = 0, last = 0;
+    const size = () => {
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      w = cv.clientWidth; h = cv.clientHeight;
+      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    size();
+    const N = Math.max(36, Math.min(110, Math.round(w * h / 9000)));
+    const rnd = (a, z) => a + Math.random() * (z - a);
+    const make = (fresh) => ({
+      x: rnd(-0.1, 1.1) * w,
+      y: fresh ? rnd(1.02, 1.5) * h : rnd(0.2, 1.3) * h,
+      vx: rnd(-14, 14), vy: rnd(-70, -26),
+      r: rnd(0.8, 2.6), life: rnd(0.4, 1), hue: rnd(22, 44), sway: rnd(0.6, 2.2), ph: rnd(0, 6.28)
+    });
+    const ps = Array.from({ length: N }, () => make(false));
+    const t0 = performance.now();
+    const draw = (now) => {
+      raf = requestAnimationFrame(draw);
+      const dt = Math.min(0.05, (now - (last || now)) / 1000);
+      last = now;
+      const t = (now - t0) / 1000;
+      // Before the name lands the sparks are drawn toward it; after, they are pushed away
+      const pull = t < strike ? Math.min(1, t / strike) : 0;
+      const blow = t > strike ? Math.min(1, (t - strike) / 0.45) : 0;
+      const cx = w / 2, cy = h * 0.5;
+      c.clearRect(0, 0, w, h);
+      c.globalCompositeOperation = 'lighter';
+      for (const p of ps) {
+        const dx = cx - p.x, dy = cy - p.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        p.vx += (dx / dist) * pull * 46 * dt - (dx / dist) * blow * 240 * dt;
+        p.vy += (dy / dist) * pull * 46 * dt - (dy / dist) * blow * 240 * dt;
+        p.vy -= 10 * dt;
+        p.x += (p.vx + Math.sin(t * p.sway + p.ph) * 16) * dt;
+        p.y += p.vy * dt;
+        p.life -= dt * 0.22;
+        if (p.life <= 0 || p.y < -40) { Object.assign(p, make(true)); continue; }
+        const near = 1 - Math.min(1, dist / (h * 0.55));
+        const a = Math.max(0, Math.min(1, p.life)) * (0.35 + near * 0.65) * (1 - blow * 0.7);
+        const rad = p.r * (1 + near * 1.4);
+        const gr = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 5);
+        gr.addColorStop(0, `hsla(${p.hue}, 100%, 72%, ${a})`);
+        gr.addColorStop(0.35, `hsla(${p.hue - 8}, 100%, 52%, ${a * 0.45})`);
+        gr.addColorStop(1, 'hsla(20, 100%, 40%, 0)');
+        c.fillStyle = gr;
+        c.beginPath();
+        c.arc(p.x, p.y, rad * 5, 0, 6.2832);
+        c.fill();
+      }
+      // A warm bloom swells behind the name as it lands
+      const bloom = t < strike ? Math.pow(Math.min(1, t / strike), 3) * 0.5 : Math.max(0, 0.5 - (t - strike) * 0.55);
+      if (bloom > 0.002) {
+        const bg = c.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.42);
+        bg.addColorStop(0, `rgba(255, 176, 92, ${bloom * 0.5})`);
+        bg.addColorStop(1, 'rgba(255, 120, 40, 0)');
+        c.fillStyle = bg;
+        c.fillRect(0, 0, w, h);
+      }
+      c.globalCompositeOperation = 'source-over';
+    };
+    raf = requestAnimationFrame(draw);
+    window.addEventListener('resize', size);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', size); };
   }
 
   function intro() {
@@ -442,9 +618,9 @@ window.Motion = (() => {
     card.addEventListener('pointerleave', () => { rx(0); ry(0); });
   }
 
-  /* ── Sideways rails: while you swipe, each photo slides inside its card, a light glides across it, the
-     captions fade as cards leave the middle, and a thumb under the rail tracks where you are. Everything
-     reads one number per card (--d, -1 to 1 from the rail's centre), so it works for touch and mouse alike. ── */
+  /* ── Sideways rails: the card nearest the middle of the screen sits forward and bright, the ones either
+     side sit back. The photo inside never moves or scales, so every bed stays sharp and whole. Each card
+     reads one number (--d, -1 to 1 from the rail's centre); a thumb under the rail tracks where you are. ── */
   function railFx(rail) {
     if (!on || rail.dataset.fx) return;
     rail.dataset.fx = '1';
@@ -459,9 +635,13 @@ window.Motion = (() => {
     const update = () => {
       raf = 0;
       const rc = rail.getBoundingClientRect();
-      const mid = rc.left + rc.width / 2, span = rc.width * 0.62;
-      const ds = items.map((el) => { const r = el.getBoundingClientRect(); return Math.max(-1, Math.min(1, (r.left + r.width / 2 - mid) / span)); });
-      items.forEach((el, i) => { el.style.setProperty('--d', ds[i].toFixed(3)); el.style.setProperty('--ad', Math.abs(ds[i]).toFixed(3)); });
+      const mid = rc.left + rc.width / 2, span = rc.width * 0.58;
+      items.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const d = Math.max(-1, Math.min(1, (r.left + r.width / 2 - mid) / span));
+        el.style.setProperty('--d', d.toFixed(3));
+        el.style.setProperty('--ad', Math.abs(d).toFixed(3));
+      });
       const max = rail.scrollWidth - rail.clientWidth;
       const share = rail.clientWidth / Math.max(1, rail.scrollWidth);
       thumb.style.width = (share * 100).toFixed(1) + '%';
@@ -476,57 +656,33 @@ window.Motion = (() => {
     rail.querySelectorAll('img').forEach((im) => { if (!im.complete) im.addEventListener('load', queue, { once: true }); });
   }
 
-  /* ── Our story: the photo opens from a rounded window, each chapter's words rise out of a blur, and the
-     photo changes with the chapter you are reading. Desktop pins the section; phones keep the photo sticky
-     at the top while the chapters scroll beneath it. ── */
+  /* ── Our story: one chapter at a time. The photo opens from a rounded window while its blurred backdrop
+     drifts, the chapter number draws a line, and the words rise out of a blur. Same on phones and desktop,
+     with no pinning, so nothing fights the address bar while you scroll. ── */
   function storyFx(story) {
     if (!on) return;
-    const steps = [...story.querySelectorAll('.story__step')];
-    const imgs = [...story.querySelectorAll('.story__media img')];
-    const media = story.querySelector('.story__media');
-    const desk = window.innerWidth >= 900;
-    const words = steps.map((s) => splitWords(s.querySelector('h2')));
-    const bits = steps.map((s) => s.querySelectorAll(':scope > span, :scope > p'));
-    const open = { trigger: story, start: 'top 85%', end: desk ? 'top top' : 'top 25%', scrub: true };
-    g.fromTo(media, { clipPath: 'inset(14% 10% 14% 10% round 28px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none', scrollTrigger: open });
-    g.fromTo(imgs[0], { scale: 1.28 }, { scale: 1, ease: 'none', scrollTrigger: open });
-    const rise = (i) => g.timeline()
-      .fromTo(words[i], { yPercent: 105, opacity: 0, filter: 'blur(10px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1, ease: 'expo.out', stagger: 0.07, clearProps: 'filter' }, 0)
-      .fromTo(bits[i], { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', stagger: 0.1, clearProps: 'transform,opacity' }, 0.15);
-
-    if (desk) {
-      story.classList.add('story--animated');
-      g.set(imgs.slice(1), { opacity: 0 });
-      const bar = document.createElement('div');
-      bar.className = 'story__bar';
-      bar.setAttribute('aria-hidden', 'true');
-      bar.innerHTML = '<i></i>';
-      story.querySelector('.story__steps').prepend(bar);
-      g.set([...steps].slice(1), { opacity: 0, y: 40 });
-      ST.create({ trigger: story, start: 'top 60%', once: true, onEnter: () => rise(0) });
-      const tl = g.timeline({ scrollTrigger: { trigger: story, start: 'top top', end: `+=${steps.length * 65}%`, scrub: 0.6, pin: true, anticipatePin: 1 } });
-      for (let i = 1; i < steps.length; i++) {
-        tl.to(steps[i - 1], { opacity: 0, y: -40, duration: 0.5 })
-          .fromTo(imgs[i - 1], i === 1 ? { opacity: 1 } : {}, { opacity: 0, scale: 1.08, duration: 0.6 }, '<')
-          .fromTo(imgs[i], { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.6 }, '<')
-          .to(steps[i], { opacity: 1, y: 0, duration: 0.5 }, '<0.2')
-          .fromTo(words[i], { yPercent: 100, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.5, stagger: 0.05 }, '<')
-          .to({}, { duration: 0.35 });
-      }
-      tl.fromTo(bar.firstChild, { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: tl.duration() }, 0);
-      return;
-    }
-
-    story.classList.add('story--flow');
-    g.set(imgs.slice(1), { opacity: 0 });
-    steps.forEach((s, i) => {
-      g.set(words[i], { yPercent: 105, opacity: 0 });
-      g.set(bits[i], { y: 22, opacity: 0 });
-      ST.create({ trigger: s, start: 'top 78%', once: true, onEnter: () => rise(i) });
-      ST.create({ trigger: s, start: 'top 62%', end: 'bottom 62%', onToggle: (self) => {
-        if (!self.isActive) return;
-        imgs.forEach((im, j) => g.to(im, { opacity: j === i ? 1 : 0, scale: j === i ? 1 : 1.12, duration: 1, ease: 'power2.out', overwrite: 'auto' }));
-      } });
+    story.querySelectorAll('.story__chapter').forEach((ch) => {
+      const pic = ch.querySelector('.story__pic');
+      const img = ch.querySelector('.story__pic img');
+      const words = splitWords(ch.querySelector('h2'));
+      const num = ch.querySelector('.story__n');
+      const para = ch.querySelector('p');
+      g.set(words, { yPercent: 110, opacity: 0 });
+      g.set([num, para], { y: 24, opacity: 0 });
+      g.set(pic, { clipPath: 'inset(12% 14% 12% 14% round 26px)' });
+      g.set(img, { scale: 1.12, opacity: 0 });
+      let shown = false;
+      const play = () => {
+        if (shown) return;
+        shown = true;
+        g.timeline()
+          .to(pic, { clipPath: 'inset(0% 0% 0% 0% round 18px)', duration: 1.25, ease: 'expo.out' }, 0)
+          .to(img, { scale: 1, opacity: 1, duration: 1.6, ease: 'expo.out' }, 0)
+          .to(num, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'transform,opacity' }, 0.25)
+          .to(words, { yPercent: 0, opacity: 1, duration: 1.05, ease: 'expo.out', stagger: 0.07 }, 0.3)
+          .to(para, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', clearProps: 'transform,opacity' }, 0.55);
+      };
+      ST.create({ trigger: ch, start: 'top 82%', once: true, onEnter: play, onEnterBack: play, onLeave: play });
     });
   }
 
@@ -538,7 +694,7 @@ window.Motion = (() => {
     g.fromTo(img, { scale: 1.4, yPercent: 8 }, { scale: 1.08, yPercent: 0, duration: 1.8, ease: 'expo.out', delay });
   }
 
-  function cover(el, src) {
+  function cover(el, src, set) {
     if (!el) return;
     const img = el.querySelector('img');
     if (!src) {
@@ -548,13 +704,19 @@ window.Motion = (() => {
       g.to(el, { height: 0, opacity: 0, marginBottom: 0, duration: 0.5, ease: 'power3.inOut', onComplete: () => { el.hidden = true; g.set(el, { clearProps: 'all' }); } });
       return;
     }
-    if (!on) { img.src = src; el.hidden = false; return; }
+    const paint = () => {
+      // srcset wins over src, so both have to change together or the old photo stays
+      if (set) img.setAttribute('srcset', set); else img.removeAttribute('srcset');
+      img.src = src;
+      el.style.setProperty('--shot', `url('${src}')`);
+    };
+    if (!on) { paint(); el.hidden = false; return; }
     g.killTweensOf([el, img]);
-    if (el.hidden) { img.src = src; el.hidden = false; coverIn(el, 0.05); return; }
+    if (el.hidden) { paint(); el.hidden = false; coverIn(el, 0.05); return; }
     if (img.getAttribute('src') === src) return;
     g.timeline()
       .to(img, { opacity: 0, scale: 1.2, duration: 0.25, ease: 'power2.in' })
-      .add(() => { img.src = src; })
+      .add(paint)
       .fromTo(img, { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1.08, duration: 1.1, ease: 'expo.out' });
   }
 
