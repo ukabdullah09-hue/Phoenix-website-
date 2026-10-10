@@ -134,7 +134,6 @@
       <section class="hero-intro" aria-labelledby="hero-t">
         <h1 id="hero-t" data-hero-title>Beds made to order in Dewsbury.</h1>
         <p class="sub" data-hero-after>Your size. Your fabric. Your colour.</p>
-        <span class="hero-pill" data-hero-after>From £240 · Handmade in Dewsbury</span>
         <div class="actions" data-hero-after><a class="btn btn--fill btn--glint" href="#shop"><span class="lbl">Shop all beds</span></a><a class="btn btn--line" href="#finder"><span class="lbl">Find my bed</span></a></div>
       </section>
 

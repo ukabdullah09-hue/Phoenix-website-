@@ -131,21 +131,38 @@ window.Motion = (() => {
     word.setAttribute('aria-label', text);
     word.innerHTML = [...text].map((ch) => `<span aria-hidden="true">${ch === ' ' ? '&nbsp;' : escText(ch)}</span>`).join('');
     const letters = word.children;
-    const STRIKE = 1.5, END = 2.55;
+    const STRIKE = 2.2, END = 4.1;
     const stopFx = embers(el.querySelector('.loader__fx'), STRIKE);
     introSound({ strike: STRIKE });
 
+    // The page is held back until the intro hands over to it, so the two cross over instead of cutting
+    const page = document.querySelectorAll('#view, .footer');
+    const chrome = document.querySelectorAll('.tabbar, .wa');
+    g.set(page, { opacity: 0, scale: 1.035, transformOrigin: '50% 40%' });
+    g.set(chrome, { opacity: 0 });
+
     g.timeline({ onComplete: () => { stopFx(); el.remove(); } })
       .fromTo(letters, { yPercent: 60, opacity: 0, filter: 'blur(16px)', scale: 1.3 },
-        { yPercent: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 1.1, ease: 'expo.out', stagger: 0.035 }, STRIKE - 0.75)
-      .fromTo(word, { letterSpacing: '0.5em' }, { letterSpacing: '-0.02em', duration: 1.5, ease: 'expo.out' }, STRIKE - 0.75)
+        { yPercent: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 1.5, ease: 'expo.out', stagger: 0.055 }, STRIKE - 1.05)
+      .fromTo(word, { letterSpacing: '0.5em' }, { letterSpacing: '-0.02em', duration: 2.1, ease: 'expo.out' }, STRIKE - 1.05)
       // The glint travels across the name: each letter sweeps its own sheen, a beat after the one before
-      .fromTo(letters, { backgroundPosition: '110% 0' }, { backgroundPosition: '-70% 0', duration: 1, ease: 'power2.inOut', stagger: 0.045 }, STRIKE + 0.1)
-      .fromTo(sub, { opacity: 0, y: 14, letterSpacing: '0.5em' }, { opacity: 1, y: 0, letterSpacing: '0.3em', duration: 1, ease: 'power3.out' }, STRIKE + 0.25)
-      .to([word, sub], { opacity: 0, y: -16, duration: 0.5, ease: 'power2.in' }, END - 0.1)
-      .to(el, { clipPath: 'inset(0% 0% 100% 0%)', duration: 1, ease: 'expo.inOut' }, END);
+      .fromTo(letters, { backgroundPosition: '110% 0' }, { backgroundPosition: '-70% 0', duration: 1.25, ease: 'power2.inOut', stagger: 0.06 }, STRIKE + 0.15)
+      .fromTo(sub, { opacity: 0, y: 14, letterSpacing: '0.5em' }, { opacity: 1, y: 0, letterSpacing: '0.3em', duration: 1.3, ease: 'power3.out' }, STRIKE + 0.35)
+      // The name drifts back and softens as the page comes forward through it
+      .to([word, sub], { opacity: 0, scale: 1.14, filter: 'blur(12px)', duration: 1.15, ease: 'power2.inOut' }, END - 0.35)
+      .to(el, { opacity: 0, duration: 1.25, ease: 'power2.inOut' }, END - 0.15)
+      .to(page, { opacity: 1, scale: 1, duration: 1.5, ease: 'expo.out', clearProps: 'transform,opacity' }, END - 0.25)
+      .to(chrome, { opacity: 1, duration: 1, ease: 'power2.out', clearProps: 'opacity' }, END + 0.05);
 
-    heroDelay = END + 0.55;
+    // The page is hidden until the intro hands over, so make sure it can never stay hidden
+    setTimeout(() => {
+      if (!el.isConnected) return;
+      stopFx();
+      el.remove();
+      g.set([...page, ...chrome], { clearProps: 'transform,opacity' });
+    }, (END + 6) * 1000);
+
+    heroDelay = END + 0.35;
     return heroDelay;
   }
 
@@ -168,7 +185,7 @@ window.Motion = (() => {
       x: rnd(-0.1, 1.1) * w,
       y: fresh ? rnd(1.02, 1.5) * h : rnd(0.2, 1.3) * h,
       vx: rnd(-14, 14), vy: rnd(-70, -26),
-      r: rnd(0.8, 2.6), life: rnd(0.4, 1), hue: rnd(22, 44), sway: rnd(0.6, 2.2), ph: rnd(0, 6.28)
+      r: rnd(0.8, 2.4), life: rnd(0.4, 1), hue: rnd(34, 48), sway: rnd(0.6, 2.2), ph: rnd(0, 6.28)
     });
     const ps = Array.from({ length: N }, () => make(false));
     const t0 = performance.now();
@@ -197,20 +214,20 @@ window.Motion = (() => {
         const a = Math.max(0, Math.min(1, p.life)) * (0.35 + near * 0.65) * (1 - blow * 0.7);
         const rad = p.r * (1 + near * 1.4);
         const gr = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 5);
-        gr.addColorStop(0, `hsla(${p.hue}, 100%, 72%, ${a})`);
-        gr.addColorStop(0.35, `hsla(${p.hue - 8}, 100%, 52%, ${a * 0.45})`);
-        gr.addColorStop(1, 'hsla(20, 100%, 40%, 0)');
+        gr.addColorStop(0, `hsla(${p.hue}, 70%, 86%, ${a})`);
+        gr.addColorStop(0.35, `hsla(${p.hue - 4}, 62%, 62%, ${a * 0.38})`);
+        gr.addColorStop(1, 'hsla(36, 60%, 46%, 0)');
         c.fillStyle = gr;
         c.beginPath();
         c.arc(p.x, p.y, rad * 5, 0, 6.2832);
         c.fill();
       }
       // A warm bloom swells behind the name as it lands
-      const bloom = t < strike ? Math.pow(Math.min(1, t / strike), 3) * 0.5 : Math.max(0, 0.5 - (t - strike) * 0.55);
+      const bloom = t < strike ? Math.pow(Math.min(1, t / strike), 3) * 0.17 : Math.max(0, 0.17 - (t - strike) * 0.22);
       if (bloom > 0.002) {
         const bg = c.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.42);
-        bg.addColorStop(0, `rgba(255, 176, 92, ${bloom * 0.5})`);
-        bg.addColorStop(1, 'rgba(255, 120, 40, 0)');
+        bg.addColorStop(0, `rgba(248, 226, 190, ${bloom * 0.5})`);
+        bg.addColorStop(1, 'rgba(230, 196, 150, 0)');
         c.fillStyle = bg;
         c.fillRect(0, 0, w, h);
       }
@@ -416,21 +433,8 @@ window.Motion = (() => {
     if (heroTitle) {
       const words = splitWords(heroTitle);
       const tl = g.timeline({ delay: d0 });
-      // A soft light blooms behind the headline, then drifts slowly for as long as the page is open
-      const heroBox = heroTitle.closest('.hero-intro');
-      if (heroBox) {
-        const glow = document.createElement('span');
-        glow.className = 'hero-glow';
-        glow.setAttribute('aria-hidden', 'true');
-        heroBox.prepend(glow);
-        tl.fromTo(glow, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 2.4, ease: 'expo.out' }, 0);
-        const drift = g.to(glow, { xPercent: 12, yPercent: -10, scale: 1.14, duration: 7, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: d0 + 1.6 });
-        cleanups.push(() => drift.kill());
-      }
       tl.from(words, { yPercent: 115, opacity: 0, rotateX: -75, filter: 'blur(14px)', transformOrigin: '50% 100%', duration: 1.25, ease: 'expo.out', stagger: 0.075, clearProps: 'filter' }, 0.1)
         .from(root.querySelectorAll('[data-hero-after]'), { y: 30, opacity: 0, scale: 0.94, duration: 1, ease: 'expo.out', stagger: 0.12, clearProps: 'transform,opacity' }, '-=0.85');
-      const pill = root.querySelector('.hero-pill');
-      if (pill) tl.fromTo(pill, { letterSpacing: '0.18em' }, { letterSpacing: '0.01em', duration: 1.4, ease: 'expo.out', clearProps: 'letterSpacing' }, '-=1.1');
       const strip = root.querySelector('[data-strip]');
       if (strip) tl.from(strip.children, { y: 34, opacity: 0, scale: 0.9, duration: 0.7, ease: 'back.out(1.6)', stagger: 0.035, clearProps: 'transform,opacity' }, '-=0.45');
     }
@@ -1252,9 +1256,11 @@ window.Motion = (() => {
 
   function transition(view, swap, first) {
     if (!on || first) { swap(); return; }
-    g.to(view, { opacity: 0, y: 10, duration: 0.18, ease: 'power2.in', onComplete: () => {
+    g.killTweensOf(view);
+    // Short on the way out so a tap feels answered at once, longer on the way in so the new page settles
+    g.to(view, { opacity: 0, scale: 0.985, y: 8, duration: 0.26, ease: 'power2.in', transformOrigin: '50% 30%', onComplete: () => {
       swap();
-      g.fromTo(view, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', clearProps: 'all', onComplete: () => ST.refresh() });
+      g.fromTo(view, { opacity: 0, scale: 1.022, y: 14 }, { opacity: 1, scale: 1, y: 0, duration: 0.62, ease: 'expo.out', transformOrigin: '50% 30%', clearProps: 'all', onComplete: () => ST.refresh() });
     } });
   }
 
