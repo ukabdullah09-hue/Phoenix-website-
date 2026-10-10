@@ -11,12 +11,10 @@ window.STORE = (() => {
   ];
 
   const CATEGORIES = [
-    { id: 'gaslift', name: 'Gaslift and drawers', short: 'Gaslift & drawers', line: 'Storage that lifts or slides out.' },
-    { id: 'luxury', name: 'Luxury beds', short: 'Luxury', line: 'Tall headboards, deep tufting.' },
-    { id: 'premium', name: 'Premium beds', short: 'Premium', line: 'Statement shapes, every size.' },
-    { id: 'storage', name: 'Storage beds', short: 'Storage', line: 'Room for everything underneath.' },
-    { id: 'kids', name: 'Kids beds', short: 'Kids', line: 'Made for growing up in.' },
-    { id: 'mattresses', name: 'Mattresses', short: 'Mattresses', line: 'Handmade to fit your frame.' }
+    { id: 'luxury', name: 'Luxury beds', short: 'Luxury', line: 'Tall headboards, deep tufting.', photo: 'images/beds/grandeur-1.jpg' },
+    { id: 'premium', name: 'Premium beds', short: 'Premium', line: 'Statement shapes, every size.', photo: 'images/beds/celine-1.jpg' },
+    { id: 'kids', name: 'Kids beds', short: 'Kids', line: 'Made for growing up in.', photo: 'images/beds/daisy-1.jpg' },
+    { id: 'mattresses', name: 'Mattresses', short: 'Mattresses', line: 'Handmade to fit your frame.', photo: 'images/mattress-matching.png' }
   ];
 
   const FABRICS = [
