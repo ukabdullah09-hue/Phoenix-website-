@@ -178,13 +178,12 @@ window.Motion = (() => {
     if (!cv) return () => {};
     const c = cv.getContext && cv.getContext('2d');
     if (!c) return () => {};
-    let w = 0, h = 0, raf = 0, last = 0, glow = null;
+    let w = 0, h = 0, raf = 0, last = 0;
     const SCALE = Math.min(1.5, window.devicePixelRatio || 1);
     const size = () => {
       w = cv.clientWidth; h = cv.clientHeight;
       cv.width = Math.max(1, Math.round(w * SCALE)); cv.height = Math.max(1, Math.round(h * SCALE));
       c.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-      glow = null;
     };
     size();
 
@@ -252,22 +251,6 @@ window.Motion = (() => {
       c.clearRect(0, 0, w, h);
       if (power <= 0.002) { c.globalAlpha = 1; return; }
       c.globalCompositeOperation = 'lighter';
-
-      // The glow the fire throws is painted once into a small picture and stretched, so each frame
-      // copies it rather than working out every pixel again
-      if (!glow) {
-        glow = document.createElement('canvas');
-        glow.width = 96; glow.height = 192;
-        const gx = glow.getContext('2d');
-        const gg = gx.createRadialGradient(48, 184, 0, 48, 184, 176);
-        gg.addColorStop(0, 'rgba(168, 34, 14, 1)');
-        gg.addColorStop(0.45, 'rgba(96, 14, 8, 0.42)');
-        gg.addColorStop(1, 'rgba(40, 5, 4, 0)');
-        gx.fillStyle = gg;
-        gx.fillRect(0, 0, 96, 192);
-      }
-      c.globalAlpha = 0.2 * power;
-      c.drawImage(glow, 0, 0, w, h);
 
       for (const p of ps) {
         p.life -= dt / p.ttl;
