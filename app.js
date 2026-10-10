@@ -37,8 +37,7 @@
   const meter = (score, cls) => `<span class="meter${cls || ''}" data-score="${score}" role="img" aria-label="Rated ${score} out of 5"><span class="meter__base" aria-hidden="true">${meterRow}</span><span class="meter__fill" aria-hidden="true">${meterRow}</span></span>`;
 
   function rating(p) {
-    const src = S.SOURCES[p.src].name;
-    return `<p class="rating"><span class="sr">Rated ${p.rating} out of 5 from ${fmt(p.count)} reviews on ${src}.</span>${meter(p.rating)}<span aria-hidden="true">${p.rating.toFixed(1)} (${fmt(p.count)}) on ${src}</span></p>`;
+    return `<p class="rating"><span class="sr">Rated ${p.rating} out of 5 from ${fmt(p.count)} reviews.</span>${meter(p.rating)}<span aria-hidden="true">${p.rating.toFixed(1)} (${fmt(p.count)} reviews)</span></p>`;
   }
 
   function heartBtn(p) {
@@ -54,15 +53,13 @@
   }
 
   function compactCard(p, hidden) {
-    const src = S.SOURCES[p.src].name;
     return `<article class="card card--compact${hidden ? ' is-hidden' : ''}" data-id="${p.id}" data-cat="${p.cat}" data-min="${p.min}" data-pop="${pop(p)}">
       <div class="card__img"><img src="${PHOTO}" alt="${ALT}" loading="lazy" decoding="async">${p.stock ? '' : '<span class="tag-oos">Out of stock</span>'}</div>
       ${heartBtn(p)}
       <div class="card__body">
         <a class="card__name" href="#bed-${p.id}">${esc(p.name)} Bed</a>
-        <span class="card__meta"><span class="sr">Rated ${p.rating} out of 5 from ${fmt(p.count)} reviews on ${src}.</span><span class="card__stars" aria-hidden="true">${meter(p.rating, ' meter--sm')} ${p.rating.toFixed(1)} (${fmt(p.count)})</span></span>
-        <span class="card__src" aria-hidden="true">${src}</span>
-        <span class="card__price">From ${money(p.min)}</span>
+        <span class="card__meta"><span class="sr">Rated ${p.rating} out of 5 from ${fmt(p.count)} reviews.</span><span class="card__stars" aria-hidden="true">${meter(p.rating, ' meter--sm')} ${p.rating.toFixed(1)} (${fmt(p.count)})</span></span>
+                <span class="card__price">From ${money(p.min)}</span>
       </div>
     </article>`;
   }
@@ -108,9 +105,9 @@
     ['Can I return a bed?', 'Beds made to custom dimensions can\'t be returned, so please double-check your measurements. Our full returns policy is to be supplied.']
   ];
   function reviewCards(list) {
-    return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review">${meter(r.stars)}<blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.date ? ` · ${r.date}` : ''}<br>Review left on ${S.SOURCES[r.src].name}</footer></figure>`).join('')}</div>`;
+    return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review">${meter(r.stars)}<blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.date ? ` · ${r.date}` : ''}</footer></figure>`).join('')}</div>`;
   }
-  const scores = () => `<div class="scores" data-stagger>${Object.values(S.SOURCES).map((s) => `<div class="score"><b data-count-to="${s.rating}">${s.rating.toFixed(1)}</b>${meter(s.rating)}<span class="muted">Average rating on ${s.name}</span></div>`).join('')}</div>`;
+  const scores = () => `<div class="scores" data-stagger>${Object.values(S.SOURCES).map((s) => `<div class="score"><b data-count-to="${s.rating}">${s.rating.toFixed(1)}</b>${meter(s.rating)}<span class="muted">Average customer rating</span></div>`).join('')}</div>`;
 
   /* ── Home ── */
   function home() {
@@ -391,7 +388,7 @@
       </div>
 
       <section class="section section--mist" aria-labelledby="pr-t"><div class="wrap">
-        <div class="head head--center"><h2 id="pr-t" data-brighten>${esc(p.name)} Bed reviews.</h2><p>Rated ${p.rating.toFixed(1)} from ${fmt(p.count)} reviews on ${S.SOURCES[p.src].name}.</p></div>
+        <div class="head head--center"><h2 id="pr-t" data-brighten>${esc(p.name)} Bed reviews.</h2><p>Rated ${p.rating.toFixed(1)} from ${fmt(p.count)} reviews.</p></div>
         ${S.REVIEWS.some((r) => r.product === p.id) ? reviewCards(S.REVIEWS.filter((r) => r.product === p.id)) : '<p style="text-align:center" class="muted">Written reviews for this bed are to be supplied. <a class="link" href="#reviews">Read all reviews</a></p>'}
       </div></section>
       <section class="section" aria-labelledby="pf-t"><div class="wrap"><div class="head head--center"><h2 id="pf-t" data-brighten>Before you order.</h2></div>${faq([FAQ[0], FAQ[1], FAQ[3], FAQ[4]])}</div></section>
