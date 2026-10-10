@@ -234,6 +234,24 @@ window.Motion = (() => {
     const N = Math.max(60, Math.min(140, Math.round(w * h / 5200)));
     const ps = Array.from({ length: N }, () => make({}, false));
 
+    // A low fire along the foot of the screen, kept small and faint: just enough that the sparks
+    // have somewhere to have come from
+    const lick = (f, fresh) => {
+      const mid = (Math.random() + Math.random() - 1);
+      f.x = w / 2 + mid * w * 0.44;
+      f.y = h * rnd(1, 1.04);
+      f.vy = -h * rnd(0.1, 0.24);
+      f.vx = rnd(-8, 8);
+      f.r = h * rnd(0.016, 0.042) * (1 - Math.abs(mid) * 0.4);
+      f.ttl = rnd(0.9, 1.7);
+      f.life = fresh ? 1 : Math.random();
+      f.sway = rnd(1, 2.6);
+      f.ph = rnd(0, 6.283);
+      return f;
+    };
+    const FN = Math.max(16, Math.min(32, Math.round(w / 16)));
+    const fs2 = Array.from({ length: FN }, () => lick({}, false));
+
     const t0 = performance.now();
     const draw = (now) => {
       raf = requestAnimationFrame(draw);
@@ -251,6 +269,20 @@ window.Motion = (() => {
       c.clearRect(0, 0, w, h);
       if (power <= 0.002) { c.globalAlpha = 1; return; }
       c.globalCompositeOperation = 'lighter';
+
+      for (const f of fs2) {
+        f.life -= dt / f.ttl;
+        if (f.life <= 0) { lick(f, true); continue; }
+        const climb = 1 - f.life;
+        f.x += (f.vx + Math.sin(t * f.sway + f.ph) * 26 * climb) * dt;
+        f.y += f.vy * (0.5 + f.life * 0.7) * dt;
+        // Cools by how high it has got, so the fire is pale only right at its foot
+        const up = Math.max(0, Math.min(1, (h - f.y) / (h * 0.3)));
+        const band = Math.max(0, Math.min(5, Math.round(2.2 + up * 3)));
+        const rad = f.r * (0.45 + f.life * 0.9);
+        c.globalAlpha = Math.min(1, f.life * 1.4) * 0.24 * power;
+        c.drawImage(SOFT[band], f.x - rad * 0.8, f.y - rad * 1.9, rad * 1.6, rad * 3.1);
+      }
 
       for (const p of ps) {
         p.life -= dt / p.ttl;
