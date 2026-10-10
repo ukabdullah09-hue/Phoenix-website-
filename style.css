@@ -331,6 +331,11 @@ body.has-buybar .wa { bottom: calc(var(--buybar-h, 76px) + 14px); }
 .meter__base { color: #dcdce1; }
 .meter__s { display: inline-block; transform-origin: 50% 60%; }
 .meter__fill { position: absolute; left: 0; top: 0; width: 0; overflow: hidden; white-space: nowrap; color: #f2b400; text-shadow: 0 1px 8px rgba(242, 180, 0, .35); }
+.meter { overflow: hidden; }
+.meter::after { content: ""; position: absolute; top: -10%; bottom: -10%; left: -70%; width: 45%; pointer-events: none; background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.9) 50%, transparent 100%); transform: skewX(-18deg); }
+.meter.is-in::after { animation: meterShine 1.2s cubic-bezier(.4, 0, .2, 1) 1 forwards; }
+@keyframes meterShine { to { left: 130%; } }
+@media (prefers-reduced-motion: reduce) { .meter::after { display: none; } }
 .meter--sm { font-size: 0.7rem; letter-spacing: 1.5px; }
 .card__stars { display: inline-flex; align-items: center; gap: 0.3rem; }
 .star { display: inline-block; }
