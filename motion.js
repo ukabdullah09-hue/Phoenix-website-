@@ -38,9 +38,10 @@ window.Motion = (() => {
     word.setAttribute('aria-label', text);
     word.innerHTML = [...text].map((ch) => `<span aria-hidden="true">${ch === ' ' ? ' ' : escText(ch)}</span>`).join('');
     g.timeline()
-      .from(word.children, { yPercent: 110, duration: 0.5, ease: 'power4.out', stagger: 0.025 })
-      .to(el, { yPercent: -100, duration: 0.7, ease: 'power4.inOut', delay: 0.2, onComplete: () => el.remove() });
-    heroDelay = 1.35;
+      .fromTo(word.children, { yPercent: 70, opacity: 0, filter: 'blur(10px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', stagger: 0.035 }, 0.1)
+      .fromTo(word, { letterSpacing: '0.45em' }, { letterSpacing: '-0.03em', duration: 1.4, ease: 'expo.out' }, 0.1)
+      .to(el, { clipPath: 'inset(0% 0% 100% 0%)', duration: 1.1, ease: 'expo.inOut', delay: 0.2, onComplete: () => el.remove() });
+    heroDelay = 1.5;
     return heroDelay;
   }
 
