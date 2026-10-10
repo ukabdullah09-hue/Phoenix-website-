@@ -137,7 +137,7 @@ window.Motion = (() => {
     const letters = el.querySelectorAll('.loader__word span i');
     const lockup = [...words, rule, sub];
     const STRIKE = 2.2, END = 4.1;
-    const stopFx = embers(el.querySelector('.loader__fx'), STRIKE);
+    const stopFx = flames(el.querySelector('.loader__fx'), STRIKE);
     introSound({ strike: STRIKE });
 
     // The page is held back until the intro hands over to it, so the two cross over instead of cutting
@@ -171,71 +171,107 @@ window.Motion = (() => {
     return heroDelay;
   }
 
-  /* Embers: warm sparks lift out of the dark, gather toward the name, then scatter when it lands. */
-  function embers(cv, strike) {
+  /* Fire: flames climb the screen behind the name, licking and curling as they cool from a white core
+     through orange into deep red. Each tongue is one pre-drawn blob, so a phone only pays for the
+     drawing, never the shading. The fire swells as the name lands, then burns down as the page opens. */
+  function flames(cv, strike) {
     if (!cv) return () => {};
-    const c = cv.getContext && cv.getContext('2d');
+    const c = cv.getContext && cv.getContext('2d', { alpha: true });
     if (!c) return () => {};
-    let w = 0, h = 0, dpr = 1, raf = 0, last = 0;
+    let w = 0, h = 0, raf = 0, last = 0, glow = null;
+    // Fire is soft, so it is drawn at well under screen resolution and stretched back up. Nobody can
+    // see the difference in flames, and it is a quarter of the pixels to shade on a phone.
+    const SCALE = 0.62;
     const size = () => {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
       w = cv.clientWidth; h = cv.clientHeight;
-      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
-      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cv.width = Math.max(1, Math.round(w * SCALE)); cv.height = Math.max(1, Math.round(h * SCALE));
+      c.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+      glow = null;
     };
     size();
-    const N = Math.max(36, Math.min(110, Math.round(w * h / 9000)));
-    const rnd = (a, z) => a + Math.random() * (z - a);
-    const make = (fresh) => ({
-      x: rnd(-0.1, 1.1) * w,
-      y: fresh ? rnd(1.02, 1.5) * h : rnd(0.2, 1.3) * h,
-      vx: rnd(-14, 14), vy: rnd(-70, -26),
-      r: rnd(0.8, 2.4), life: rnd(0.4, 1), hue: rnd(34, 48), sway: rnd(0.6, 2.2), ph: rnd(0, 6.28)
+
+    // Red fire: a small white heart at the foot, then orange, then red the whole way up
+    const BANDS = [[255, 244, 206], [255, 186, 86], [255, 112, 32], [243, 52, 18], [198, 22, 12], [120, 10, 8], [62, 5, 4]];
+    const sprites = BANDS.map(([r, g2, b]) => {
+      const sc = document.createElement('canvas');
+      const S = 72;
+      sc.width = sc.height = S;
+      const x = sc.getContext('2d');
+      const gr = x.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+      gr.addColorStop(0, `rgba(${r},${g2},${b},0.8)`);
+      gr.addColorStop(0.35, `rgba(${r},${g2},${b},0.3)`);
+      gr.addColorStop(0.7, `rgba(${r},${g2},${b},0.07)`);
+      gr.addColorStop(1, `rgba(${r},${g2},${b},0)`);
+      x.fillStyle = gr;
+      x.fillRect(0, 0, S, S);
+      return sc;
     });
-    const ps = Array.from({ length: N }, () => make(false));
+
+    const rnd = (a2, z) => a2 + Math.random() * (z - a2);
+    // Tongues start along the foot of the screen, thickest in the middle so the body of the fire
+    // sits right behind the name
+    const make = (p) => {
+      const mid = (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+      p.x = w / 2 + mid * w * 0.38;
+      p.y = h * rnd(1, 1.05);
+      p.vx = rnd(-14, 14);
+      p.vy = -h * rnd(0.46, 0.95);
+      p.r = h * rnd(0.03, 0.075) * (1 - Math.abs(mid) * 0.28);
+      p.ttl = rnd(1.2, 2.2);
+      p.life = 1;
+      p.sway = rnd(1, 3.2);
+      p.ph = rnd(0, 6.283);
+      p.spark = Math.random() < 0.1;
+      if (p.spark) { p.r *= 0.17; p.ttl *= 1.4; p.vy *= 1.3; }
+      return p;
+    };
+    const N = Math.max(130, Math.min(260, Math.round(w * h / 2400)));
+    const ps = Array.from({ length: N }, () => { const p = make({}); p.life = Math.random(); return p; });
+
     const t0 = performance.now();
     const draw = (now) => {
       raf = requestAnimationFrame(draw);
       const dt = Math.min(0.05, (now - (last || now)) / 1000);
       last = now;
       const t = (now - t0) / 1000;
-      // Before the name lands the sparks are drawn toward it; after, they are pushed away
-      const pull = t < strike ? Math.min(1, t / strike) : 0;
-      const blow = t > strike ? Math.min(1, (t - strike) / 0.45) : 0;
-      const cx = w / 2, cy = h * 0.5;
+      // The fire catches, swells as the name lands, then burns down as the page opens behind it
+      const rise = Math.min(1, t / (strike * 0.72));
+      const surge = t > strike - 0.25 && t < strike + 0.7 ? 1 + 0.5 * Math.sin((t - strike + 0.25) / 0.95 * Math.PI) : 1;
+      const fade = t > strike + 0.8 ? Math.max(0, 1 - (t - strike - 0.8) / 1.5) : 1;
+      const power = rise * surge * fade;
+
       c.clearRect(0, 0, w, h);
+      if (power <= 0.001) { c.globalAlpha = 1; return; }
       c.globalCompositeOperation = 'lighter';
+
+      // The glow the fire throws onto the dark behind it, built once and dimmed with the fire
+      if (!glow) {
+        glow = c.createRadialGradient(w / 2, h * 1.02, 0, w / 2, h * 1.02, h * 1.1);
+        glow.addColorStop(0, 'rgba(196, 34, 14, 1)');
+        glow.addColorStop(0.4, 'rgba(130, 16, 8, 0.47)');
+        glow.addColorStop(1, 'rgba(50, 5, 4, 0)');
+      }
+      c.globalAlpha = 0.34 * power;
+      c.fillStyle = glow;
+      c.fillRect(0, 0, w, h);
+
       for (const p of ps) {
-        const dx = cx - p.x, dy = cy - p.y;
-        const dist = Math.hypot(dx, dy) || 1;
-        p.vx += (dx / dist) * pull * 46 * dt - (dx / dist) * blow * 240 * dt;
-        p.vy += (dy / dist) * pull * 46 * dt - (dy / dist) * blow * 240 * dt;
-        p.vy -= 10 * dt;
-        p.x += (p.vx + Math.sin(t * p.sway + p.ph) * 16) * dt;
-        p.y += p.vy * dt;
-        p.life -= dt * 0.22;
-        if (p.life <= 0 || p.y < -40) { Object.assign(p, make(true)); continue; }
-        const near = 1 - Math.min(1, dist / (h * 0.55));
-        const a = Math.max(0, Math.min(1, p.life)) * (0.35 + near * 0.65) * (1 - blow * 0.7);
-        const rad = p.r * (1 + near * 1.4);
-        const gr = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, rad * 5);
-        gr.addColorStop(0, `hsla(${p.hue}, 70%, 86%, ${a})`);
-        gr.addColorStop(0.35, `hsla(${p.hue - 4}, 62%, 62%, ${a * 0.38})`);
-        gr.addColorStop(1, 'hsla(36, 60%, 46%, 0)');
-        c.fillStyle = gr;
-        c.beginPath();
-        c.arc(p.x, p.y, rad * 5, 0, 6.2832);
-        c.fill();
+        p.life -= dt / p.ttl;
+        if (p.life <= 0 || p.y < -h * 0.2) { make(p); continue; }
+        // Flames curl harder the higher they climb, and cool by height rather than by age, so the
+        // fire is white only at its foot and red all the way up
+        const climb = 1 - p.life;
+        p.x += (p.vx + Math.sin(t * p.sway + p.ph) * 46 * climb) * dt;
+        p.y += p.vy * (0.5 + p.life * 0.7) * dt;
+        const up = Math.max(0, Math.min(1, (h - p.y) / (h * 0.88)));
+        const band = Math.min(6, Math.floor(Math.pow(up, 0.52) * 6.4) + (p.spark ? 1 : 0));
+        const rad = p.spark ? p.r * (0.6 + p.life * 0.5) : p.r * (0.45 + p.life * 0.85);
+        c.globalAlpha = Math.min(1, p.life * (p.spark ? 1.5 : 0.62) * (1 - up * 0.35)) * power;
+        // Tongues are drawn taller than they are wide, so the fire licks instead of bubbling
+        const tw = rad * (p.spark ? 2 : 1.3), th = rad * (p.spark ? 2 : 3.7);
+        c.drawImage(sprites[Math.min(band, 6)], p.x - tw / 2, p.y - th * 0.62, tw, th);
       }
-      // A warm bloom swells behind the name as it lands
-      const bloom = t < strike ? Math.pow(Math.min(1, t / strike), 3) * 0.17 : Math.max(0, 0.17 - (t - strike) * 0.22);
-      if (bloom > 0.002) {
-        const bg = c.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.42);
-        bg.addColorStop(0, `rgba(248, 226, 190, ${bloom * 0.5})`);
-        bg.addColorStop(1, 'rgba(230, 196, 150, 0)');
-        c.fillStyle = bg;
-        c.fillRect(0, 0, w, h);
-      }
+      c.globalAlpha = 1;
       c.globalCompositeOperation = 'source-over';
     };
     raf = requestAnimationFrame(draw);
