@@ -14,7 +14,6 @@ window.STORE = (() => {
     { id: 'gaslift', name: 'Gaslift and drawers', short: 'Gaslift & drawers', line: 'Storage that lifts or slides out.', photo: 'images/storage-gaslift.png' },
     { id: 'luxury', name: 'Luxury beds', short: 'Luxury', line: 'Tall headboards, deep tufting.', photo: 'images/beds/grandeur-1.jpg' },
     { id: 'premium', name: 'Premium beds', short: 'Premium', line: 'Statement shapes, every size.', photo: 'images/beds/celine-1.jpg' },
-    { id: 'kids', name: 'Kids beds', short: 'Kids', line: 'Made for growing up in.', photo: 'images/beds/daisy-1.jpg' },
     { id: 'mattresses', name: 'Mattresses', short: 'Mattresses', line: 'Handmade to fit your frame.', photo: 'images/mattress-matching.png' }
   ];
 
@@ -69,19 +68,19 @@ window.STORE = (() => {
 
   const P = (o) => Object.assign({ stock: true, fabric: 'plush' }, o);
   const PRODUCTS = [
-    P({ id: 'celine', name: 'Celine', cat: 'premium', photos: ["images/beds/celine-1.jpg", "images/beds/celine-2.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'sparkle', name: 'Sparkle', cat: 'premium', photos: ["images/beds/sparkle-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'mirage', name: 'Mirage', cat: 'premium', photos: ["images/beds/mirage-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'apollo', name: 'Apollo', cat: 'premium', photos: ["images/beds/apollo-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'sapphire', name: 'Sapphire', cat: 'premium', photos: ["images/beds/sapphire-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'neo', name: 'Neo', cat: 'premium', photos: ["images/beds/neo-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'sunshine', name: 'Sunshine', cat: 'premium', photos: ["images/beds/sunshine-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'pandora', name: 'Pandora', cat: 'premium', photos: ["images/beds/pandora-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'diva', name: 'Diva', cat: 'premium', photos: ["images/beds/diva-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'butterfly', name: 'Butterfly', cat: 'premium', photos: ["images/beds/butterfly-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'eve', name: 'Eve', cat: 'premium', photos: ["images/beds/eve-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'axel-sleigh', name: 'Axel Sleigh', cat: 'premium', photos: ["images/beds/axel-sleigh-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'avalon', name: 'Avalon', cat: 'premium', photos: ["images/beds/avalon-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'celine', name: 'Celine', cat: 'luxury', photos: ["images/beds/celine-1.jpg", "images/beds/celine-2.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'sparkle', name: 'Sparkle', cat: 'luxury', photos: ["images/beds/sparkle-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'mirage', name: 'Mirage', cat: 'luxury', photos: ["images/beds/mirage-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'apollo', name: 'Apollo', cat: 'luxury', photos: ["images/beds/apollo-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'sapphire', name: 'Sapphire', cat: 'luxury', photos: ["images/beds/sapphire-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'neo', name: 'Neo', cat: 'luxury', photos: ["images/beds/neo-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'sunshine', name: 'Sunshine', cat: 'luxury', photos: ["images/beds/sunshine-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'pandora', name: 'Pandora', cat: 'luxury', photos: ["images/beds/pandora-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'diva', name: 'Diva', cat: 'luxury', photos: ["images/beds/diva-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'butterfly', name: 'Butterfly', cat: 'luxury', photos: ["images/beds/butterfly-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'eve', name: 'Eve', cat: 'luxury', photos: ["images/beds/eve-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'axel-sleigh', name: 'Axel Sleigh', cat: 'luxury', photos: ["images/beds/axel-sleigh-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'avalon', name: 'Avalon', cat: 'luxury', photos: ["images/beds/avalon-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'lilly', name: 'Lilly', cat: 'premium', photos: ["images/beds/lilly-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'aurora', name: 'Aurora', cat: 'premium', photos: ["images/beds/aurora-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'magnus', name: 'Magnus', cat: 'premium', photos: ["images/beds/magnus-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
@@ -94,18 +93,18 @@ window.STORE = (() => {
     P({ id: 'princess', name: 'Princess', cat: 'premium', photos: ["images/beds/princess-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'ray', name: 'Ray', cat: 'premium', photos: ["images/beds/ray-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'hex', name: 'Hex', cat: 'premium', photos: ["images/beds/hex-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'ciri', name: 'Ciri', cat: 'premium', photos: ["images/beds/ciri-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'grandeur', name: 'Grandeur', cat: 'premium', photos: ["images/beds/grandeur-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'grace', name: 'Grace', cat: 'premium', photos: ["images/beds/grace-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'golden', name: 'Golden', cat: 'premium', photos: ["images/beds/golden-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'mega-bubble', name: 'Mega Bubble', cat: 'premium', photos: ["images/beds/mega-bubble-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'remy', name: 'Remy', cat: 'premium', photos: ["images/beds/remy-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'rogue', name: 'Rogue', cat: 'premium', photos: ["images/beds/rogue-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'alexa', name: 'Alexa', cat: 'premium', photos: ["images/beds/alexa-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'ada', name: 'Ada', cat: 'premium', photos: ["images/beds/ada-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'june', name: 'June', cat: 'premium', photos: ["images/beds/june-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'daisy', name: 'Daisy', cat: 'premium', photos: ["images/beds/daisy-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ id: 'nova', name: 'Nova', cat: 'premium', photos: ["images/beds/nova-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' })
+    P({ id: 'ciri', name: 'Ciri', cat: 'gaslift', photos: ["images/beds/ciri-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'grandeur', name: 'Grandeur', cat: 'gaslift', photos: ["images/beds/grandeur-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'grace', name: 'Grace', cat: 'gaslift', photos: ["images/beds/grace-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'golden', name: 'Golden', cat: 'gaslift', photos: ["images/beds/golden-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'mega-bubble', name: 'Mega Bubble', cat: 'gaslift', photos: ["images/beds/mega-bubble-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'remy', name: 'Remy', cat: 'gaslift', photos: ["images/beds/remy-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'rogue', name: 'Rogue', cat: 'gaslift', photos: ["images/beds/rogue-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'alexa', name: 'Alexa', cat: 'gaslift', photos: ["images/beds/alexa-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'ada', name: 'Ada', cat: 'gaslift', photos: ["images/beds/ada-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'june', name: 'June', cat: 'gaslift', photos: ["images/beds/june-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'daisy', name: 'Daisy', cat: 'gaslift', photos: ["images/beds/daisy-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'nova', name: 'Nova', cat: 'gaslift', photos: ["images/beds/nova-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' })
   ];
 
   const round5 = (n) => Math.round(n / 5) * 5;
