@@ -1,10 +1,6 @@
-/* Product data read from the Mattresses & Beds UK and Cool & Comfy site videos.
-   Values marked placeholder are stand-ins until confirmed. */
+/* Product data: bed names and photos from the supplied catalogue. Prices are placeholders until confirmed. */
 window.STORE = (() => {
-  const SOURCES = {
-    mb: { name: 'Mattresses & Beds UK', rating: 4.8 },
-    cc: { name: 'Cool & Comfy', rating: 4.9 }
-  };
+  const SOURCES = {};
 
   const SIZES = [
     { id: 'single', name: 'Single', feet: "3'0\" × 6'3\"", cm: '90 × 190 cm', w: 90, l: 190 },
@@ -74,41 +70,43 @@ window.STORE = (() => {
 
   const P = (o) => Object.assign({ stock: true, fabric: 'plush' }, o);
   const PRODUCTS = [
-    P({ id: 'ember', name: 'Ember', cat: 'luxury', src: 'mb', rating: 4.8, count: 2341, prices: [450, 470, 500, 550, 600], style: 'panel', colour: 'grey',
-        about: 'One of our most loved designs: a grand, tall headboard with deep vertical panels that frame the whole bed.',
-        bullets: ['Tall panelled headboard, our signature design', 'Solid timber frame, no creaks or squeaks', 'Plush velvet in the colour of your choice', 'Built to order in our Dewsbury workshop', '24-month warranty on frame and stitching'] }),
-    P({ id: 'emerald', name: 'Emerald', cat: 'luxury', src: 'mb', rating: 4.7, count: 2156, range: [465, 575], style: 'wing', colour: 'silver',
-        about: 'Panelled headboard with sculpted wings that wrap around the pillows.' }),
-    P({ id: 'mirage', name: 'Mirage', cat: 'luxury', src: 'mb', rating: 4.7, count: 2314, range: [440, 550], style: 'chesterfield', colour: 'cream', stock: false,
-        about: 'Deep-buttoned headboard in a soft, bright finish.' }),
-    P({ id: 'bubble', name: 'Bubble', cat: 'premium', src: 'mb', rating: 4.8, count: 2780, range: [630, 720], style: 'bubble', colour: 'cream',
-        about: 'Rounded, cushioned panels for a soft, sculptural look.' }),
-    P({ id: 'elite', name: 'Elite', cat: 'premium', src: 'mb', rating: 4.6, count: 2402, range: [350, 500], style: 'channel', colour: 'cream', stock: false,
-        about: 'Slim channel tufting from top to bottom, with a matching base.' }),
-    P({ id: 'skye', name: 'Skye', cat: 'premium', src: 'mb', rating: 4.8, count: 2296, range: [360, 470], style: 'panel', colour: 'silver',
-        about: 'Clean panelled headboard that suits any room.' }),
-    P({ id: 'crystal', name: 'Crystal', cat: 'gaslift', src: 'mb', rating: 4.8, count: 1156, range: [450, 600], pricePlaceholder: true, style: 'chesterfield', colour: 'charcoal',
-        about: 'Buttoned headboard over a lift-up storage base.' }),
-    P({ id: 'ambassador', name: 'Ambassador', cat: 'gaslift', src: 'mb', rating: 4.7, count: 1073, range: [450, 600], pricePlaceholder: true, style: 'wing', colour: 'grey',
-        about: 'Winged headboard with plenty of storage below.' }),
-    P({ id: 'pearl', name: 'Pearl', cat: 'luxury', src: 'cc', rating: 4.9, count: 1439, from: 240, style: 'chesterfield', colour: 'silver',
-        about: 'Buttoned wingback headboard with a hotel-style finish.' }),
-    P({ id: 'isla', name: 'Isla', cat: 'luxury', src: 'cc', rating: 5.0, count: 1123, from: 425, style: 'panel', colour: 'cream',
-        about: 'Tall vertical panels in a soft, light velvet.' }),
-    P({ id: 'royal-nova', name: 'Royal Nova', cat: 'storage', src: 'cc', rating: 5.0, count: 1189, from: 390, style: 'chesterfield', colour: 'charcoal',
-        about: 'Deep-buttoned headboard over a full storage base.' }),
-    P({ id: 'akira', name: 'Akira', cat: 'storage', src: 'cc', rating: 4.7, count: 847, from: 260, style: 'pinch', colour: 'grey',
-        about: 'Pinch-pleated headboard and base with room underneath.' }),
-    P({ id: 'herman', name: 'Herman', cat: 'storage', src: 'cc', rating: 5.0, count: 291, from: 240, style: 'chesterfield', colour: 'black',
-        about: 'A darker, deep-buttoned bed with storage below.' }),
-    P({ id: 'crown', name: 'Crown', cat: 'storage', src: 'cc', rating: 5.0, count: 1056, prices: [270, 300, 300, 325, 375], pricePlaceholderSizes: ['super-king'], style: 'pinch', colour: 'cream',
-        about: 'Pinch-pleated velvet across the headboard and base.' }),
-    P({ id: 'horizon', name: 'Horizon', cat: 'premium', src: 'cc', rating: 4.8, count: 667, range: [275, 360], style: 'panel', colour: 'grey',
-        about: 'Low, wide panels for a calm, modern room.' }),
-    P({ id: 'hazel', name: 'Hazel', cat: 'premium', src: 'cc', rating: 4.8, count: 478, range: [590, 780], style: 'wing', colour: 'cream',
-        about: 'A tall winged headboard that makes the bed the centrepiece.' }),
-    P({ id: 'quention', name: 'Quention', cat: 'luxury', src: 'cc', rating: 4.8, count: 342, range: [610, 750], style: 'chesterfield', colour: 'charcoal',
-        about: 'Grand buttoned headboard with a deep, padded frame.' })
+    P({ id: 'celine', name: 'Celine', cat: 'premium', photos: ["images/beds/celine-1.jpg", "images/beds/celine-2.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'sparkle', name: 'Sparkle', cat: 'premium', photos: ["images/beds/sparkle-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'mirage', name: 'Mirage', cat: 'premium', photos: ["images/beds/mirage-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'apollo', name: 'Apollo', cat: 'premium', photos: ["images/beds/apollo-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'sapphire', name: 'Sapphire', cat: 'premium', photos: ["images/beds/sapphire-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'neo', name: 'Neo', cat: 'premium', photos: ["images/beds/neo-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'sunshine', name: 'Sunshine', cat: 'premium', photos: ["images/beds/sunshine-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'pandora', name: 'Pandora', cat: 'premium', photos: ["images/beds/pandora-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'diva', name: 'Diva', cat: 'premium', photos: ["images/beds/diva-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'butterfly', name: 'Butterfly', cat: 'premium', photos: ["images/beds/butterfly-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'eve', name: 'Eve', cat: 'premium', photos: ["images/beds/eve-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'axel-sleigh', name: 'Axel Sleigh', cat: 'premium', photos: ["images/beds/axel-sleigh-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'avalon', name: 'Avalon', cat: 'premium', photos: ["images/beds/avalon-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'lilly', name: 'Lilly', cat: 'premium', photos: ["images/beds/lilly-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'aurora', name: 'Aurora', cat: 'premium', photos: ["images/beds/aurora-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'magnus', name: 'Magnus', cat: 'premium', photos: ["images/beds/magnus-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'horizon', name: 'Horizon', cat: 'premium', photos: ["images/beds/horizon-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'aura', name: 'Aura', cat: 'premium', photos: ["images/beds/aura-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'brooklyn', name: 'Brooklyn', cat: 'premium', photos: ["images/beds/brooklyn-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'luna', name: 'Luna', cat: 'premium', photos: ["images/beds/luna-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'omega', name: 'Omega', cat: 'premium', photos: ["images/beds/omega-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'crown', name: 'Crown', cat: 'premium', photos: ["images/beds/crown-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'princess', name: 'Princess', cat: 'premium', photos: ["images/beds/princess-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'ray', name: 'Ray', cat: 'premium', photos: ["images/beds/ray-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'hex', name: 'Hex', cat: 'premium', photos: ["images/beds/hex-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'ciri', name: 'Ciri', cat: 'premium', photos: ["images/beds/ciri-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'grandeur', name: 'Grandeur', cat: 'premium', photos: ["images/beds/grandeur-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'grace', name: 'Grace', cat: 'premium', photos: ["images/beds/grace-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'golden', name: 'Golden', cat: 'premium', photos: ["images/beds/golden-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'mega-bubble', name: 'Mega Bubble', cat: 'premium', photos: ["images/beds/mega-bubble-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'remy', name: 'Remy', cat: 'premium', photos: ["images/beds/remy-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'rogue', name: 'Rogue', cat: 'premium', photos: ["images/beds/rogue-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'alexa', name: 'Alexa', cat: 'premium', photos: ["images/beds/alexa-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'ada', name: 'Ada', cat: 'premium', photos: ["images/beds/ada-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'june', name: 'June', cat: 'premium', photos: ["images/beds/june-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'daisy', name: 'Daisy', cat: 'premium', photos: ["images/beds/daisy-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'nova', name: 'Nova', cat: 'premium', photos: ["images/beds/nova-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' })
   ];
 
   const round5 = (n) => Math.round(n / 5) * 5;
@@ -126,14 +124,7 @@ window.STORE = (() => {
     p.max = Math.max(...p.prices);
   });
 
-  const REVIEWS = [
-    { src: 'cc', name: 'Jade Marie Laithwaite', product: 'isla', date: 'January 2025', stars: 5,
-      text: 'I have had this bed now for three months and it has by far exceeded my expectations in every single way! It\'s comfortable, sturdy and looks fantastic. The ordering process and delivery was really easy and straightforward.' },
-    { src: 'cc', name: 'Adam B.', date: 'October 2026', stars: 5,
-      text: 'So happy with it. The storage underneath is a life saver, was packed well. Ordering was simple enough and I was informed.' },
-    { src: 'mb', name: 'Verified buyer', date: '', stars: 5,
-      text: 'A really great quality bed and mattress, very well packed and delivered. Easy to assemble. Would highly recommend.' }
-  ];
+  const REVIEWS = [];
 
   const money = (n) => '£' + n.toLocaleString('en-GB');
   const product = (id) => PRODUCTS.find((p) => p.id === id);
