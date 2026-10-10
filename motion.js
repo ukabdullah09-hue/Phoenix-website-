@@ -240,10 +240,33 @@ window.Motion = (() => {
     if (heroTitle) {
       const words = splitWords(heroTitle);
       const tl = g.timeline({ delay: d0 });
-      tl.from(words, { yPercent: 70, opacity: 0, rotateX: -50, transformOrigin: '50% 100%', duration: 0.95, ease: 'power4.out', stagger: 0.06 })
-        .from(root.querySelectorAll('[data-hero-after]'), { y: 20, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.09, clearProps: 'transform,opacity' }, '-=0.55');
+      // A soft light blooms behind the headline, then drifts slowly for as long as the page is open
+      const heroBox = heroTitle.closest('.hero-intro');
+      if (heroBox) {
+        const glow = document.createElement('span');
+        glow.className = 'hero-glow';
+        glow.setAttribute('aria-hidden', 'true');
+        heroBox.prepend(glow);
+        tl.fromTo(glow, { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 2.4, ease: 'expo.out' }, 0);
+        const drift = g.to(glow, { xPercent: 12, yPercent: -10, scale: 1.14, duration: 7, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: d0 + 1.6 });
+        cleanups.push(() => drift.kill());
+      }
+      tl.from(words, { yPercent: 115, opacity: 0, rotateX: -75, filter: 'blur(14px)', transformOrigin: '50% 100%', duration: 1.25, ease: 'expo.out', stagger: 0.075, clearProps: 'filter' }, 0.1)
+        .from(root.querySelectorAll('[data-hero-after]'), { y: 30, opacity: 0, scale: 0.94, duration: 1, ease: 'expo.out', stagger: 0.12, clearProps: 'transform,opacity' }, '-=0.85');
+      const pill = root.querySelector('.hero-pill');
+      if (pill) tl.fromTo(pill, { letterSpacing: '0.18em' }, { letterSpacing: '0.01em', duration: 1.4, ease: 'expo.out', clearProps: 'letterSpacing' }, '-=1.1');
       const strip = root.querySelector('[data-strip]');
       if (strip) tl.from(strip.children, { y: 34, opacity: 0, scale: 0.9, duration: 0.7, ease: 'back.out(1.6)', stagger: 0.035, clearProps: 'transform,opacity' }, '-=0.45');
+    }
+
+    // Category pages: the title lifts out of a blur, the chips slide in, the cover photo wipes open
+    const shopHead = root.querySelector('.shop-head');
+    if (shopHead) {
+      g.fromTo(shopHead.querySelector('.shop-title'), { yPercent: 70, opacity: 0, filter: 'blur(12px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', delay: d0, clearProps: 'transform,opacity,filter' });
+      g.from(shopHead.querySelector('.shop-line'), { y: 18, opacity: 0, duration: 0.9, ease: 'power3.out', delay: d0 + 0.12, clearProps: 'transform,opacity' });
+      g.from(root.querySelectorAll('#chips a'), { x: 36, opacity: 0, duration: 0.8, ease: 'expo.out', stagger: 0.05, delay: d0 + 0.2, clearProps: 'transform,opacity' });
+      const cv = root.querySelector('#shop-cover');
+      if (cv && !cv.hidden) coverIn(cv, d0 + 0.1);
     }
 
     const zoom = root.querySelector('.zoom');
@@ -257,6 +280,9 @@ window.Motion = (() => {
       // A full-screen blur costs phones a lot of frames; they get a plain fade instead
       if (fine) g.fromTo(imgs[0], { filter: 'blur(14px)' }, { filter: 'blur(0px)', duration: 1.4, ease: 'power2.out', delay: d0, clearProps: 'filter' });
       else if (imgs[0].complete) g.from(imgs[0], { opacity: 0, duration: 1, ease: 'power2.out', delay: d0, clearProps: 'opacity' });
+      // The first photo wipes up from the bottom as the page opens
+      const fig0 = zoom.querySelector('.zoom__frame');
+      if (track && fig0) g.fromTo(fig0, { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.5, ease: 'expo.inOut', delay: d0 + 0.25, clearProps: 'clipPath' });
       // Caption, dots and arrows stay untappable until they have faded in
       if (track) { g.set(zoom, { '--cap': 0 }); zoom.classList.add('cap-off'); } else g.set(cap, { opacity: 0, y: 30 });
       const tl = g.timeline({ scrollTrigger: { trigger: zoom, start: 'top top', end: '+=80%', scrub: 0.6, pin: true, anticipatePin: 1,
@@ -313,20 +339,7 @@ window.Motion = (() => {
     root.querySelectorAll('.gallery__track').forEach((t) => depth(t, 'img', 0.3, 0));
 
     const story = root.querySelector('.story');
-    if (story && window.innerWidth >= 900) {
-      story.classList.add('story--animated');
-      const steps = story.querySelectorAll('.story__step');
-      const imgs = story.querySelectorAll('.story__media img');
-      g.set([...steps].slice(1), { opacity: 0, y: 40 });
-      const tl = g.timeline({ scrollTrigger: { trigger: story, start: 'top top', end: `+=${steps.length * 65}%`, scrub: 0.6, pin: true, anticipatePin: 1 } });
-      for (let i = 1; i < steps.length; i++) {
-        tl.to(steps[i - 1], { opacity: 0, y: -40, duration: 0.5 })
-          .to(imgs[i - 1], { opacity: 0, scale: 1.08, duration: 0.6 }, '<')
-          .fromTo(imgs[i], { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.6 }, '<')
-          .to(steps[i], { opacity: 1, y: 0, duration: 0.5 }, '<0.2')
-          .to({}, { duration: 0.35 });
-      }
-    }
+    if (story) storyFx(story);
 
     root.querySelectorAll('[data-brighten]').forEach((el) => {
       const words = splitWords(el);
@@ -350,7 +363,12 @@ window.Motion = (() => {
       const fold = window.innerHeight;
       const now = shown.filter((c) => c.getBoundingClientRect().top < fold);
       const later = shown.filter((c) => c.getBoundingClientRect().top >= fold);
-      g.from(now, { y: 30, opacity: 0, scale: 0.96, duration: 0.6, ease: 'power3.out', stagger: 0.03, delay: d0 + 0.15, clearProps: 'transform,opacity' });
+      // Each card rises and settles while its photo eases out of a zoom
+      g.from(now, { y: 56, opacity: 0, scale: 0.92, duration: 1, ease: 'expo.out', stagger: 0.05, delay: d0 + 0.3, clearProps: 'transform,opacity' });
+      now.forEach((c, i) => {
+        const im = c.querySelector('.card__img img');
+        if (im) g.fromTo(im, { scale: 1.35, transition: 'none' }, { scale: 1, duration: 1.5, ease: 'expo.out', delay: d0 + 0.3 + i * 0.05, clearProps: 'transform,transition' });
+      });
       if (later.length) {
         g.set(later, { y: 46, opacity: 0, scale: 0.94 });
         box._batch = ST.batch(later, { start: 'top 96%', once: true, onEnter: (els) => g.to(els, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: 'power3.out', stagger: 0.07, clearProps: 'transform,opacity' }) });
@@ -360,6 +378,7 @@ window.Motion = (() => {
     root.querySelectorAll('.rail').forEach((rail) => {
       g.from(rail.children, { y: 28, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, clearProps: 'transform,opacity', scrollTrigger: { trigger: rail, start: 'top 88%', once: true } });
       drag(rail);
+      railFx(rail);
     });
 
     root.querySelectorAll('.steps-wrap').forEach((wrap) => {
@@ -421,6 +440,122 @@ window.Motion = (() => {
       card.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
     });
     card.addEventListener('pointerleave', () => { rx(0); ry(0); });
+  }
+
+  /* ── Sideways rails: while you swipe, each photo slides inside its card, a light glides across it, the
+     captions fade as cards leave the middle, and a thumb under the rail tracks where you are. Everything
+     reads one number per card (--d, -1 to 1 from the rail's centre), so it works for touch and mouse alike. ── */
+  function railFx(rail) {
+    if (!on || rail.dataset.fx) return;
+    rail.dataset.fx = '1';
+    const items = [...rail.children];
+    const bar = document.createElement('div');
+    bar.className = 'rail-bar';
+    bar.setAttribute('aria-hidden', 'true');
+    bar.innerHTML = '<i></i>';
+    rail.after(bar);
+    const thumb = bar.firstChild;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const rc = rail.getBoundingClientRect();
+      const mid = rc.left + rc.width / 2, span = rc.width * 0.62;
+      const ds = items.map((el) => { const r = el.getBoundingClientRect(); return Math.max(-1, Math.min(1, (r.left + r.width / 2 - mid) / span)); });
+      items.forEach((el, i) => { el.style.setProperty('--d', ds[i].toFixed(3)); el.style.setProperty('--ad', Math.abs(ds[i]).toFixed(3)); });
+      const max = rail.scrollWidth - rail.clientWidth;
+      const share = rail.clientWidth / Math.max(1, rail.scrollWidth);
+      thumb.style.width = (share * 100).toFixed(1) + '%';
+      thumb.style.transform = `translateX(${max > 0 ? (rail.scrollLeft / max) * (1 / share - 1) * 100 : 0}%)`;
+    };
+    const queue = () => { if (!raf) raf = requestAnimationFrame(update); };
+    rail.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue);
+    cleanups.push(() => window.removeEventListener('resize', queue));
+    queue();
+    setTimeout(queue, 600);
+    rail.querySelectorAll('img').forEach((im) => { if (!im.complete) im.addEventListener('load', queue, { once: true }); });
+  }
+
+  /* ── Our story: the photo opens from a rounded window, each chapter's words rise out of a blur, and the
+     photo changes with the chapter you are reading. Desktop pins the section; phones keep the photo sticky
+     at the top while the chapters scroll beneath it. ── */
+  function storyFx(story) {
+    if (!on) return;
+    const steps = [...story.querySelectorAll('.story__step')];
+    const imgs = [...story.querySelectorAll('.story__media img')];
+    const media = story.querySelector('.story__media');
+    const desk = window.innerWidth >= 900;
+    const words = steps.map((s) => splitWords(s.querySelector('h2')));
+    const bits = steps.map((s) => s.querySelectorAll(':scope > span, :scope > p'));
+    const open = { trigger: story, start: 'top 85%', end: desk ? 'top top' : 'top 25%', scrub: true };
+    g.fromTo(media, { clipPath: 'inset(14% 10% 14% 10% round 28px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'none', scrollTrigger: open });
+    g.fromTo(imgs[0], { scale: 1.28 }, { scale: 1, ease: 'none', scrollTrigger: open });
+    const rise = (i) => g.timeline()
+      .fromTo(words[i], { yPercent: 105, opacity: 0, filter: 'blur(10px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1, ease: 'expo.out', stagger: 0.07, clearProps: 'filter' }, 0)
+      .fromTo(bits[i], { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out', stagger: 0.1, clearProps: 'transform,opacity' }, 0.15);
+
+    if (desk) {
+      story.classList.add('story--animated');
+      g.set(imgs.slice(1), { opacity: 0 });
+      const bar = document.createElement('div');
+      bar.className = 'story__bar';
+      bar.setAttribute('aria-hidden', 'true');
+      bar.innerHTML = '<i></i>';
+      story.querySelector('.story__steps').prepend(bar);
+      g.set([...steps].slice(1), { opacity: 0, y: 40 });
+      ST.create({ trigger: story, start: 'top 60%', once: true, onEnter: () => rise(0) });
+      const tl = g.timeline({ scrollTrigger: { trigger: story, start: 'top top', end: `+=${steps.length * 65}%`, scrub: 0.6, pin: true, anticipatePin: 1 } });
+      for (let i = 1; i < steps.length; i++) {
+        tl.to(steps[i - 1], { opacity: 0, y: -40, duration: 0.5 })
+          .fromTo(imgs[i - 1], i === 1 ? { opacity: 1 } : {}, { opacity: 0, scale: 1.08, duration: 0.6 }, '<')
+          .fromTo(imgs[i], { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.6 }, '<')
+          .to(steps[i], { opacity: 1, y: 0, duration: 0.5 }, '<0.2')
+          .fromTo(words[i], { yPercent: 100, opacity: 0, filter: 'blur(8px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.5, stagger: 0.05 }, '<')
+          .to({}, { duration: 0.35 });
+      }
+      tl.fromTo(bar.firstChild, { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: tl.duration() }, 0);
+      return;
+    }
+
+    story.classList.add('story--flow');
+    g.set(imgs.slice(1), { opacity: 0 });
+    steps.forEach((s, i) => {
+      g.set(words[i], { yPercent: 105, opacity: 0 });
+      g.set(bits[i], { y: 22, opacity: 0 });
+      ST.create({ trigger: s, start: 'top 78%', once: true, onEnter: () => rise(i) });
+      ST.create({ trigger: s, start: 'top 62%', end: 'bottom 62%', onToggle: (self) => {
+        if (!self.isActive) return;
+        imgs.forEach((im, j) => g.to(im, { opacity: j === i ? 1 : 0, scale: j === i ? 1 : 1.12, duration: 1, ease: 'power2.out', overwrite: 'auto' }));
+      } });
+    });
+  }
+
+  /* ── Category cover photo: wipes open on arrival, crossfades when you switch category, folds away for All beds ── */
+  function coverIn(el, delay) {
+    const img = el.querySelector('img');
+    g.killTweensOf([el, img]);
+    g.fromTo(el, { clipPath: 'inset(0% 0% 100% 0% round 22px)' }, { clipPath: 'inset(0% 0% 0% 0% round 22px)', duration: 1.1, ease: 'expo.out', delay, clearProps: 'clipPath' });
+    g.fromTo(img, { scale: 1.4, yPercent: 8 }, { scale: 1.08, yPercent: 0, duration: 1.8, ease: 'expo.out', delay });
+  }
+
+  function cover(el, src) {
+    if (!el) return;
+    const img = el.querySelector('img');
+    if (!src) {
+      if (el.hidden) return;
+      if (!on) { el.hidden = true; return; }
+      g.killTweensOf([el, img]);
+      g.to(el, { height: 0, opacity: 0, marginBottom: 0, duration: 0.5, ease: 'power3.inOut', onComplete: () => { el.hidden = true; g.set(el, { clearProps: 'all' }); } });
+      return;
+    }
+    if (!on) { img.src = src; el.hidden = false; return; }
+    g.killTweensOf([el, img]);
+    if (el.hidden) { img.src = src; el.hidden = false; coverIn(el, 0.05); return; }
+    if (img.getAttribute('src') === src) return;
+    g.timeline()
+      .to(img, { opacity: 0, scale: 1.2, duration: 0.25, ease: 'power2.in' })
+      .add(() => { img.src = src; })
+      .fromTo(img, { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1.08, duration: 1.1, ease: 'expo.out' });
   }
 
   function drag(rail) {
@@ -971,5 +1106,5 @@ window.Motion = (() => {
     if (on && el) g.fromTo(el, { rotate: 0 }, { rotate: 360, duration: 0.7, ease: 'back.out(1.6)' });
   }
 
-  return { on, reduce, onReset: (fn) => cleanups.push(fn), fadeUp, loader, intro, progress, nav, pressFx, buttons, reset, page, ring, seg, chips, flip, heart, addToBag, bump, money, flipNum, pop, fadeSwap, textSwap, flash, shake, collapse, slideIn, slideOut, morphStart, morphCancel, transition, sheet, spin, burst, burstAt, splitWords };
+  return { on, reduce, onReset: (fn) => cleanups.push(fn), fadeUp, cover, loader, intro, progress, nav, pressFx, buttons, reset, page, ring, seg, chips, flip, heart, addToBag, bump, money, flipNum, pop, fadeSwap, textSwap, flash, shake, collapse, slideIn, slideOut, morphStart, morphCancel, transition, sheet, spin, burst, burstAt, splitWords };
 })();

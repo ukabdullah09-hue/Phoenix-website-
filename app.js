@@ -226,6 +226,7 @@
       title: `${C ? C.name : 'All beds'} | Phoenix Beds`,
       html: `<section class="shop"><div class="wrap wrap--wide">
         <div class="shop-head"><h1 class="shop-title" id="shop-title">${C ? C.name : 'All beds'}</h1><p class="shop-line" id="shop-line" data-hero-after>${C ? C.line : 'Every bed is made to order in our Dewsbury workshop.'}</p></div>
+        <figure class="shop-cover" id="shop-cover"${C ? '' : ' hidden'}><img${C ? ` src="${C.photo || PHOTO}"` : ''} alt=""></figure>
         <div class="filterbar" data-hero-after><nav class="chips" id="chips" aria-label="Bed categories">${chips.map(([id, label]) => `<a href="#shop${id ? '-' + id : ''}" data-cat="${id}" ${(id || '') === (c || '') ? 'aria-current="page"' : ''}>${label}${n(id) ? `<span class="chips__n">${n(id)}</span>` : ''}</a>`).join('')}</nav></div>
         <div class="sortrow"><p class="count-line" id="count-line" aria-live="polite"></p>
           <div class="seg seg--sm seg--icon" id="sizeseg" role="group" aria-label="Grid size">${[['dense', 'grid3', 'More beds per row'], ['large', 'grid', 'Bigger photos']].map(([k, ic, l]) => `<button type="button" data-size="${k}" aria-pressed="${k === dense()}" aria-label="${l}" title="${l}">${icon(ic)}</button>`).join('')}</div>
@@ -273,8 +274,8 @@
           const empty = document.getElementById('shop-empty');
           empty.hidden = shown > 0;
           if (!shown) {
-            document.getElementById('empty-t').textContent = ctl.cat === 'mattresses' ? 'Mattress range to be supplied.' : 'Kids beds to be supplied.';
-            document.getElementById('empty-p').textContent = ctl.cat === 'mattresses' ? 'You can add a matching handmade mattress to any bed when you order.' : 'Any of our beds can be made in a single or small double.';
+            document.getElementById('empty-t').textContent = ctl.cat === 'mattresses' ? 'Mattress range to be supplied.' : 'No beds in this section yet.';
+            document.getElementById('empty-p').textContent = ctl.cat === 'mattresses' ? 'You can add a matching handmade mattress to any bed when you order.' : 'Browse every bed, or try another section.';
           }
         };
         ctl.apply = (newCat, newSort, animate) => {
@@ -293,6 +294,7 @@
           M.textSwap(document.getElementById('shop-title'), C3 ? C3.name : 'All beds');
           M.textSwap(document.getElementById('shop-line'), C3 ? C3.line : 'Every bed is made to order in our Dewsbury workshop.');
           document.title = `${C3 ? C3.name : 'All beds'} | Phoenix Beds`;
+          M.cover(document.getElementById('shop-cover'), C3 ? (C3.photo || PHOTO) : null);
         };
         sortEl.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
           sortEl.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b));
@@ -688,7 +690,7 @@
       name: 'reviews',
       title: 'Reviews | Phoenix Beds',
       html: `<section class="section" style="padding-top:clamp(2rem,5vw,3.5rem)"><div class="wrap wrap--wide">
-        <div class="head head--center"><h1 class="page-h1" data-hero-title>Customer reviews.</h1><p data-hero-after>Phoenix Beds comes from the team behind Mattresses &amp; Beds UK and Cool &amp; Comfy. These reviews were left on those stores.</p></div>
+        <div class="head head--center"><h1 class="page-h1" data-hero-title>Customer reviews.</h1><p data-hero-after>What Phoenix Beds customers say about their beds.</p></div>
         ${scores()}<div style="height:12px"></div>${reviewCards(S.REVIEWS)}
         <div class="head head--center" style="margin-top:3rem"><h2 data-brighten>Ratings by bed.</h2></div>
         <div class="grid-compact" data-stagger>${byPop(S.PRODUCTS).map((p) => compactCard(p, false)).join('')}</div>
@@ -704,8 +706,7 @@
       <section class="zoom" aria-label="Our workshop"><figure class="zoom__frame"><img src="${PHOTO}" alt="${ALT}"></figure><div class="zoom__cap"><h2>Built by our own team.</h2><p>Cut, upholstered and finished in Dewsbury.</p></div></section>
       <section class="section"><div class="wrap" style="max-width:760px;display:grid;gap:1.25rem;font-size:1.2rem" data-stagger>
         <p>Phoenix Beds makes beds and mattresses to order in Dewsbury, West Yorkshire. Each frame is built, upholstered and finished by our own team, in the size, fabric and colour you choose.</p>
-        <p class="muted">We're the team behind Mattresses &amp; Beds UK and Cool &amp; Comfy. Phoenix brings our full range together in one place.</p>
-        <p class="muted">Because we make every bed ourselves, there are no suppliers to pay before we start. That's why we only ask for a small deposit, and you pay the rest when your bed arrives.</p>
+                <p class="muted">Because we make every bed ourselves, there are no suppliers to pay before we start. That's why we only ask for a small deposit, and you pay the rest when your bed arrives.</p>
         <p><a class="btn btn--fill" href="#shop"><span class="lbl">Shop beds</span></a></p>
       </div></section>`
     };
