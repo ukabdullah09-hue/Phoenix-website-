@@ -222,6 +222,8 @@
   let shopCtl = null;
   const SORTS = [['popular', 'Popular'], ['low', 'Lowest price'], ['high', 'Highest price']];
   const dense = () => (keep.get('grid', 'dense') === 'large' ? 'large' : 'dense');
+  const ALL_COVER = 'images/beds/celine-1.jpg';
+  const cover = (C) => (C && C.photo) || ALL_COVER;
   function shop(c) {
     const C = S.CATEGORIES.find((x) => x.id === c);
     const n = (id) => S.PRODUCTS.filter((p) => !id || p.cat === id).length;
@@ -231,7 +233,7 @@
       title: `${C ? C.name : 'All beds'} | Phoenix Beds`,
       html: `<section class="shop"><div class="wrap wrap--wide">
         <div class="shop-head"><h1 class="shop-title" id="shop-title">${C ? C.name : 'All beds'}</h1><p class="shop-line" id="shop-line" data-hero-after>${C ? C.line : 'Every bed is made to order in our Dewsbury workshop.'}</p></div>
-        <figure class="shop-cover shot" id="shop-cover"${C ? ` style="--shot:url('${C.photo || PHOTO}')"` : ' hidden'}><img${C ? ` src="${C.photo || PHOTO}"${ss(C.photo, '100vw')}` : ''} alt=""></figure>
+        <figure class="shop-cover shot" id="shop-cover" style="--shot:url('${cover(C)}')"><img src="${cover(C)}"${ss(cover(C), '100vw')} alt=""></figure>
         <div class="filterbar" data-hero-after><nav class="chips" id="chips" aria-label="Bed categories">${chips.map(([id, label]) => `<a href="#shop${id ? '-' + id : ''}" data-cat="${id}" ${(id || '') === (c || '') ? 'aria-current="page"' : ''}>${label}${n(id) ? `<span class="chips__n">${n(id)}</span>` : ''}</a>`).join('')}</nav></div>
         <div class="sortrow"><p class="count-line" id="count-line" aria-live="polite"></p>
           <div class="seg seg--sm seg--icon" id="sizeseg" role="group" aria-label="Grid size">${[['dense', 'grid3', 'More beds per row'], ['large', 'grid', 'Bigger photos']].map(([k, ic, l]) => `<button type="button" data-size="${k}" aria-pressed="${k === dense()}" aria-label="${l}" title="${l}">${icon(ic)}</button>`).join('')}</div>
@@ -299,8 +301,8 @@
           M.textSwap(document.getElementById('shop-title'), C3 ? C3.name : 'All beds');
           M.textSwap(document.getElementById('shop-line'), C3 ? C3.line : 'Every bed is made to order in our Dewsbury workshop.');
           document.title = `${C3 ? C3.name : 'All beds'} | Phoenix Beds`;
-          const csrc = C3 ? (C3.photo || PHOTO) : null;
-          M.cover(document.getElementById('shop-cover'), csrc, csrc ? setOf(csrc) : '');
+          const csrc = cover(C3);
+          M.cover(document.getElementById('shop-cover'), csrc, setOf(csrc));
         };
         sortEl.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
           sortEl.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b));

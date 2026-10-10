@@ -125,12 +125,17 @@ window.Motion = (() => {
     if (!el) return 0;
     if (!on) return 0;
     el.style.animation = 'none';
-    const word = el.querySelector('.loader__word');
+    const words = [...el.querySelectorAll('.loader__word')];
+    const rule = el.querySelector('.loader__rule');
     const sub = el.querySelector('.loader__sub');
-    const text = word.textContent;
-    word.setAttribute('aria-label', text);
-    word.innerHTML = [...text].map((ch) => `<span aria-hidden="true">${ch === ' ' ? '&nbsp;' : escText(ch)}</span>`).join('');
-    const letters = word.children;
+    // Each letter sits in its own window, so it rises into place from behind the line rather than fading in
+    words.forEach((w) => {
+      const text = w.textContent;
+      w.setAttribute('aria-label', text);
+      w.innerHTML = [...text].map((ch) => `<span aria-hidden="true"><i>${ch === ' ' ? '&nbsp;' : escText(ch)}</i></span>`).join('');
+    });
+    const letters = el.querySelectorAll('.loader__word span i');
+    const lockup = [...words, rule, sub];
     const STRIKE = 2.2, END = 4.1;
     const stopFx = embers(el.querySelector('.loader__fx'), STRIKE);
     introSound({ strike: STRIKE });
@@ -142,14 +147,14 @@ window.Motion = (() => {
     g.set(chrome, { opacity: 0 });
 
     g.timeline({ onComplete: () => { stopFx(); el.remove(); } })
-      .fromTo(letters, { yPercent: 60, opacity: 0, filter: 'blur(16px)', scale: 1.3 },
-        { yPercent: 0, opacity: 1, filter: 'blur(0px)', scale: 1, duration: 1.5, ease: 'expo.out', stagger: 0.055 }, STRIKE - 1.05)
-      .fromTo(word, { letterSpacing: '0.5em' }, { letterSpacing: '-0.02em', duration: 2.1, ease: 'expo.out' }, STRIKE - 1.05)
+      .fromTo(letters, { yPercent: 118 }, { yPercent: 0, duration: 1.5, ease: 'expo.out', stagger: 0.045 }, STRIKE - 1.05)
+      .fromTo(words[0], { letterSpacing: '0.62em', textIndent: '0.62em' }, { letterSpacing: '0.34em', textIndent: '0.34em', duration: 2.2, ease: 'expo.out' }, STRIKE - 1.05)
+      .fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.5, ease: 'expo.out' }, STRIKE - 0.35)
       // The glint travels across the name: each letter sweeps its own sheen, a beat after the one before
       .fromTo(letters, { backgroundPosition: '110% 0' }, { backgroundPosition: '-70% 0', duration: 1.25, ease: 'power2.inOut', stagger: 0.06 }, STRIKE + 0.15)
-      .fromTo(sub, { opacity: 0, y: 14, letterSpacing: '0.5em' }, { opacity: 1, y: 0, letterSpacing: '0.3em', duration: 1.3, ease: 'power3.out' }, STRIKE + 0.35)
+      .fromTo(sub, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 1.3, ease: 'power3.out' }, STRIKE + 0.35)
       // The name drifts back and softens as the page comes forward through it
-      .to([word, sub], { opacity: 0, scale: 1.14, filter: 'blur(12px)', duration: 1.15, ease: 'power2.inOut' }, END - 0.35)
+      .to(lockup, { opacity: 0, scale: 1.12, filter: 'blur(10px)', duration: 1.15, ease: 'power2.inOut' }, END - 0.35)
       .to(el, { opacity: 0, duration: 1.25, ease: 'power2.inOut' }, END - 0.15)
       .to(page, { opacity: 1, scale: 1, duration: 1.5, ease: 'expo.out', clearProps: 'transform,opacity' }, END - 0.25)
       .to(chrome, { opacity: 1, duration: 1, ease: 'power2.out', clearProps: 'opacity' }, END + 0.05);
@@ -458,11 +463,24 @@ window.Motion = (() => {
       const cap = zoom.querySelector('.zoom__cap');
       const inset = window.innerWidth < 700 ? '6% 5% 6% 5%' : '10% 16% 10% 16%';
       // A full-screen blur costs phones a lot of frames; they get a plain fade instead
-      if (fine) g.fromTo(imgs[0], { filter: 'blur(14px)' }, { filter: 'blur(0px)', duration: 1.4, ease: 'power2.out', delay: d0, clearProps: 'filter' });
-      else if (imgs[0].complete) g.from(imgs[0], { opacity: 0, duration: 1, ease: 'power2.out', delay: d0, clearProps: 'opacity' });
-      // The first photo wipes up from the bottom as the page opens
+      // Hold the whole frame back until its photo has decoded, then open it. The frame carries the
+      // blurred backing as well as the photo, so revealing it together is what stops the picture
+      // snapping onto the screen in one frame.
       const fig0 = zoom.querySelector('.zoom__frame');
-      if (track && fig0) g.fromTo(fig0, { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.5, ease: 'expo.inOut', delay: d0 + 0.25, clearProps: 'clipPath' });
+      const first0 = imgs[0];
+      g.set(fig0, { opacity: 0 });
+      let opened = false;
+      const openFirst = () => {
+        if (opened) return;
+        opened = true;
+        g.to(fig0, { opacity: 1, duration: 1.1, ease: 'power2.out', clearProps: 'opacity' });
+        if (track) g.fromTo(fig0, { clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.4, ease: 'expo.inOut', clearProps: 'clipPath' });
+        if (fine) g.fromTo(first0, { filter: 'blur(12px)' }, { filter: 'blur(0px)', duration: 1.3, ease: 'power2.out', clearProps: 'filter' });
+      };
+      const decoded = first0.decode ? first0.decode().catch(() => {}) : Promise.resolve();
+      decoded.then(() => g.delayedCall(Math.max(0, d0 - 0.25), openFirst));
+      // Never leave the picture hidden if the photo cannot be decoded
+      g.delayedCall(d0 + 3, openFirst);
       // Caption, dots and arrows stay untappable until they have faded in
       if (track) { g.set(zoom, { '--cap': 0 }); zoom.classList.add('cap-off'); } else g.set(cap, { opacity: 0, y: 30 });
       const tl = g.timeline({ scrollTrigger: { trigger: zoom, start: 'top top', end: '+=80%', scrub: 0.6, pin: true, anticipatePin: 1,
@@ -544,10 +562,11 @@ window.Motion = (() => {
       const now = shown.filter((c) => c.getBoundingClientRect().top < fold);
       const later = shown.filter((c) => c.getBoundingClientRect().top >= fold);
       // Each card rises and settles while its photo eases out of a zoom
-      g.from(now, { y: 56, opacity: 0, scale: 0.92, duration: 1, ease: 'expo.out', stagger: 0.05, delay: d0 + 0.3, clearProps: 'transform,opacity' });
+      const gd = d0 + (first ? 0.3 : 0.06);
+      g.from(now, { y: 56, opacity: 0, scale: 0.92, duration: 1, ease: 'expo.out', stagger: 0.05, delay: gd, clearProps: 'transform,opacity' });
       now.forEach((c, i) => {
         const im = c.querySelector('.card__img img');
-        if (im) g.fromTo(im, { scale: 1.35, transition: 'none' }, { scale: 1, duration: 1.5, ease: 'expo.out', delay: d0 + 0.3 + i * 0.05, clearProps: 'transform,transition' });
+        if (im) g.fromTo(im, { scale: 1.35, transition: 'none' }, { scale: 1, duration: 1.5, ease: 'expo.out', delay: gd + i * 0.05, clearProps: 'transform,transition' });
       });
       if (later.length) {
         g.set(later, { y: 46, opacity: 0, scale: 0.94 });
@@ -701,13 +720,7 @@ window.Motion = (() => {
   function cover(el, src, set) {
     if (!el) return;
     const img = el.querySelector('img');
-    if (!src) {
-      if (el.hidden) return;
-      if (!on) { el.hidden = true; return; }
-      g.killTweensOf([el, img]);
-      g.to(el, { height: 0, opacity: 0, marginBottom: 0, duration: 0.5, ease: 'power3.inOut', onComplete: () => { el.hidden = true; g.set(el, { clearProps: 'all' }); } });
-      return;
-    }
+    if (!src) return;
     const paint = () => {
       // srcset wins over src, so both have to change together or the old photo stays
       if (set) img.setAttribute('srcset', set); else img.removeAttribute('srcset');
@@ -982,7 +995,7 @@ window.Motion = (() => {
   }
 
   /* Photos that are still downloading shimmer, then fade in */
-  const SHIM_BOX = '.card__img, .cat__img, .zoom__frame, .story__media';
+  const SHIM_BOX = '.card__img, .cat__img, .zoom__frame, .story__pic, .shop-cover, .gallery__track figure';
   function shimmer(root) {
     root.querySelectorAll('img').forEach((img) => {
       if (img.complete) return;
@@ -1257,11 +1270,28 @@ window.Motion = (() => {
   function transition(view, swap, first) {
     if (!on || first) { swap(); return; }
     g.killTweensOf(view);
-    // Short on the way out so a tap feels answered at once, longer on the way in so the new page settles
-    g.to(view, { opacity: 0, scale: 0.985, y: 8, duration: 0.26, ease: 'power2.in', transformOrigin: '50% 30%', onComplete: () => {
-      swap();
-      g.fromTo(view, { opacity: 0, scale: 1.022, y: 14 }, { opacity: 1, scale: 1, y: 0, duration: 0.62, ease: 'expo.out', transformOrigin: '50% 30%', clearProps: 'all', onComplete: () => ST.refresh() });
-    } });
+    // The page being left is lifted out of the view and held on screen while the new one is built and
+    // starts arriving underneath, then dissolved off. Without this the new page is caught half-built,
+    // which is what reads as a cut.
+    const r = view.getBoundingClientRect();
+    const top = Math.max(0, r.top);
+    const ghost = document.createElement('div');
+    ghost.className = 'ghost';
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.style.top = top + 'px';
+    const held = document.createElement('div');
+    held.className = 'ghost__in';
+    held.style.top = (r.top - top) + 'px';
+    // Moving the nodes rather than copying them keeps every photo decoded, so the still never flickers
+    while (view.firstChild) held.appendChild(view.firstChild);
+    ghost.appendChild(held);
+    document.body.appendChild(ghost);
+
+    swap();
+    g.timeline({ onComplete: () => { ghost.remove(); ST.refresh(); } })
+      .to(ghost, { opacity: 0, duration: 0.55, ease: 'power2.inOut' }, 0)
+      .to(held, { scale: 1.025, y: -10, duration: 0.55, ease: 'power2.in' }, 0)
+      .fromTo(view, { opacity: 0 }, { opacity: 1, duration: 0.45, ease: 'power2.out', clearProps: 'opacity' }, 0.06);
   }
 
   function sheet(el, open) {
