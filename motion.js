@@ -137,7 +137,7 @@ window.Motion = (() => {
     const letters = el.querySelectorAll('.loader__word span i');
     const lockup = [...words, rule, sub];
     const STRIKE = 2.2, END = 4.1;
-    const stopFx = flames(el.querySelector('.loader__fx'), STRIKE);
+    const stopFx = sparks(el.querySelector('.loader__fx'), STRIKE);
     introSound({ strike: STRIKE });
 
     // The page is held back until the intro hands over to it, so the two cross over instead of cutting
@@ -171,17 +171,15 @@ window.Motion = (() => {
     return heroDelay;
   }
 
-  /* Fire: flames climb the screen behind the name, licking and curling as they cool from a white core
-     through orange into deep red. Each tongue is one pre-drawn blob, so a phone only pays for the
-     drawing, never the shading. The fire swells as the name lands, then burns down as the page opens. */
-  function flames(cv, strike) {
+  /* Fire sparks: embers lift through the dark behind the name. What keeps it from looking cheap is
+     depth — a few big ones drift close to you, soft and out of focus, while the small ones sit far
+     back, crisp and bright. They gather toward the name as it lands, then let go. */
+  function sparks(cv, strike) {
     if (!cv) return () => {};
-    const c = cv.getContext && cv.getContext('2d', { alpha: true });
+    const c = cv.getContext && cv.getContext('2d');
     if (!c) return () => {};
     let w = 0, h = 0, raf = 0, last = 0, glow = null;
-    // Fire is soft, so it is drawn at well under screen resolution and stretched back up. Nobody can
-    // see the difference in flames, and it is a quarter of the pixels to shade on a phone.
-    const SCALE = 0.62;
+    const SCALE = Math.min(1.5, window.devicePixelRatio || 1);
     const size = () => {
       w = cv.clientWidth; h = cv.clientHeight;
       cv.width = Math.max(1, Math.round(w * SCALE)); cv.height = Math.max(1, Math.round(h * SCALE));
@@ -190,43 +188,52 @@ window.Motion = (() => {
     };
     size();
 
-    // Red fire: a small white heart at the foot, then orange, then red the whole way up
-    const BANDS = [[255, 244, 206], [255, 186, 86], [255, 112, 32], [243, 52, 18], [198, 22, 12], [120, 10, 8], [62, 5, 4]];
-    const sprites = BANDS.map(([r, g2, b]) => {
+    // Each ember is drawn once into a sprite: a hot centre inside a wide halo, from ash red up to
+    // white hot. Drawing a picture costs a phone almost nothing; shading one costs it a frame.
+    const HEAT = [[255, 248, 226], [255, 214, 142], [255, 158, 62], [249, 96, 30], [214, 44, 18], [150, 22, 12]];
+    const sprite = (r, g2, b, soft) => {
       const sc = document.createElement('canvas');
-      const S = 72;
+      const S = 96;
       sc.width = sc.height = S;
       const x = sc.getContext('2d');
       const gr = x.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
-      gr.addColorStop(0, `rgba(${r},${g2},${b},0.8)`);
-      gr.addColorStop(0.35, `rgba(${r},${g2},${b},0.3)`);
-      gr.addColorStop(0.7, `rgba(${r},${g2},${b},0.07)`);
+      if (soft) {
+        gr.addColorStop(0, `rgba(${r},${g2},${b},0.78)`);
+        gr.addColorStop(0.32, `rgba(${r},${g2},${b},0.3)`);
+        gr.addColorStop(0.62, `rgba(${r},${g2},${b},0.08)`);
+      } else {
+        gr.addColorStop(0, 'rgba(255,255,255,1)');
+        gr.addColorStop(0.09, `rgba(${r},${g2},${b},1)`);
+        gr.addColorStop(0.22, `rgba(${r},${g2},${b},0.5)`);
+        gr.addColorStop(0.45, `rgba(${r},${g2},${b},0.12)`);
+      }
       gr.addColorStop(1, `rgba(${r},${g2},${b},0)`);
       x.fillStyle = gr;
       x.fillRect(0, 0, S, S);
       return sc;
-    });
+    };
+    const SHARP = HEAT.map(([r, g2, b]) => sprite(r, g2, b, false));
+    const SOFT = HEAT.map(([r, g2, b]) => sprite(r, g2, b, true));
 
     const rnd = (a2, z) => a2 + Math.random() * (z - a2);
-    // Tongues start along the foot of the screen, thickest in the middle so the body of the fire
-    // sits right behind the name
-    const make = (p) => {
-      const mid = (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
-      p.x = w / 2 + mid * w * 0.38;
-      p.y = h * rnd(1, 1.05);
-      p.vx = rnd(-14, 14);
-      p.vy = -h * rnd(0.46, 0.95);
-      p.r = h * rnd(0.03, 0.075) * (1 - Math.abs(mid) * 0.28);
-      p.ttl = rnd(1.2, 2.2);
-      p.life = 1;
-      p.sway = rnd(1, 3.2);
+    const make = (p, fresh) => {
+      // Depth decides everything: near embers are big, soft and dim, far ones small, sharp and bright
+      p.z = Math.pow(Math.random(), 1.8);
+      p.x = rnd(-0.08, 1.08) * w;
+      p.y = fresh ? h * rnd(1, 1.12) : rnd(0.15, 1.1) * h;
+      p.r = (1.1 + p.z * 9) * (h / 760);
+      p.vy = -h * rnd(0.05, 0.14) * (0.45 + p.z * 0.9);
+      p.vx = rnd(-10, 10) * (0.3 + p.z);
+      p.ttl = rnd(2.6, 5.4);
+      p.life = fresh ? 1 : rnd(0.25, 1);
+      p.sway = rnd(0.5, 1.7);
       p.ph = rnd(0, 6.283);
-      p.spark = Math.random() < 0.1;
-      if (p.spark) { p.r *= 0.17; p.ttl *= 1.4; p.vy *= 1.3; }
+      p.flick = rnd(5, 12);
+      p.heat = rnd(0, 1);
       return p;
     };
-    const N = Math.max(130, Math.min(260, Math.round(w * h / 2400)));
-    const ps = Array.from({ length: N }, () => { const p = make({}); p.life = Math.random(); return p; });
+    const N = Math.max(60, Math.min(140, Math.round(w * h / 5200)));
+    const ps = Array.from({ length: N }, () => make({}, false));
 
     const t0 = performance.now();
     const draw = (now) => {
@@ -234,42 +241,53 @@ window.Motion = (() => {
       const dt = Math.min(0.05, (now - (last || now)) / 1000);
       last = now;
       const t = (now - t0) / 1000;
-      // The fire catches, swells as the name lands, then burns down as the page opens behind it
-      const rise = Math.min(1, t / (strike * 0.72));
-      const surge = t > strike - 0.25 && t < strike + 0.7 ? 1 + 0.5 * Math.sin((t - strike + 0.25) / 0.95 * Math.PI) : 1;
-      const fade = t > strike + 0.8 ? Math.max(0, 1 - (t - strike - 0.8) / 1.5) : 1;
-      const power = rise * surge * fade;
+      const rise = Math.min(1, t / (strike * 0.5));
+      const fade = t > strike + 1.2 ? Math.max(0, 1 - (t - strike - 1.2) / 1.4) : 1;
+      const power = rise * fade;
+      const cx = w / 2, cy = h * 0.5;
+      // Drawn toward the name while it forms, released once it has landed
+      const pull = t < strike ? Math.min(1, t / strike) * 26 : 0;
+      const push = t > strike && t < strike + 0.8 ? (1 - (t - strike) / 0.8) * 54 : 0;
 
       c.clearRect(0, 0, w, h);
-      if (power <= 0.001) { c.globalAlpha = 1; return; }
+      if (power <= 0.002) { c.globalAlpha = 1; return; }
       c.globalCompositeOperation = 'lighter';
 
-      // The glow the fire throws onto the dark behind it, built once and dimmed with the fire
+      // The glow the fire throws is painted once into a small picture and stretched, so each frame
+      // copies it rather than working out every pixel again
       if (!glow) {
-        glow = c.createRadialGradient(w / 2, h * 1.02, 0, w / 2, h * 1.02, h * 1.1);
-        glow.addColorStop(0, 'rgba(196, 34, 14, 1)');
-        glow.addColorStop(0.4, 'rgba(130, 16, 8, 0.47)');
-        glow.addColorStop(1, 'rgba(50, 5, 4, 0)');
+        glow = document.createElement('canvas');
+        glow.width = 96; glow.height = 192;
+        const gx = glow.getContext('2d');
+        const gg = gx.createRadialGradient(48, 184, 0, 48, 184, 176);
+        gg.addColorStop(0, 'rgba(168, 34, 14, 1)');
+        gg.addColorStop(0.45, 'rgba(96, 14, 8, 0.42)');
+        gg.addColorStop(1, 'rgba(40, 5, 4, 0)');
+        gx.fillStyle = gg;
+        gx.fillRect(0, 0, 96, 192);
       }
-      c.globalAlpha = 0.34 * power;
-      c.fillStyle = glow;
-      c.fillRect(0, 0, w, h);
+      c.globalAlpha = 0.2 * power;
+      c.drawImage(glow, 0, 0, w, h);
 
       for (const p of ps) {
         p.life -= dt / p.ttl;
-        if (p.life <= 0 || p.y < -h * 0.2) { make(p); continue; }
-        // Flames curl harder the higher they climb, and cool by height rather than by age, so the
-        // fire is white only at its foot and red all the way up
-        const climb = 1 - p.life;
-        p.x += (p.vx + Math.sin(t * p.sway + p.ph) * 46 * climb) * dt;
-        p.y += p.vy * (0.5 + p.life * 0.7) * dt;
-        const up = Math.max(0, Math.min(1, (h - p.y) / (h * 0.88)));
-        const band = Math.min(6, Math.floor(Math.pow(up, 0.52) * 6.4) + (p.spark ? 1 : 0));
-        const rad = p.spark ? p.r * (0.6 + p.life * 0.5) : p.r * (0.45 + p.life * 0.85);
-        c.globalAlpha = Math.min(1, p.life * (p.spark ? 1.5 : 0.62) * (1 - up * 0.35)) * power;
-        // Tongues are drawn taller than they are wide, so the fire licks instead of bubbling
-        const tw = rad * (p.spark ? 2 : 1.3), th = rad * (p.spark ? 2 : 3.7);
-        c.drawImage(sprites[Math.min(band, 6)], p.x - tw / 2, p.y - th * 0.62, tw, th);
+        if (p.life <= 0 || p.y < -h * 0.12) { make(p, true); continue; }
+        const dx = cx - p.x, dy = cy - p.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        p.x += (p.vx + Math.sin(t * p.sway + p.ph) * 14 * (0.4 + p.z) + (dx / dist) * (pull - push)) * dt;
+        p.y += (p.vy + (dy / dist) * (pull - push)) * dt;
+        // Embers cool as they climb, and the near ones sit lower in the fire than the far ones
+        const up = Math.max(0, Math.min(1, (h - p.y) / h));
+        const band = Math.max(0, Math.min(5, Math.round(p.heat * 1.4 + up * 3.2)));
+        // Fades in at birth, out at death, with a slow flicker through the middle
+        const edge = Math.min(1, p.life * 4.5, (1 - p.life) * 6);
+        const flick = 0.78 + 0.22 * Math.sin(t * p.flick + p.ph);
+        const near = 1 - Math.min(1, dist / (h * 0.62));
+        const rad = p.r * (1 + near * 0.3);
+        c.globalAlpha = Math.max(0, edge * flick * (0.62 + (1 - p.z) * 0.38) * (0.7 + near * 0.3)) * power;
+        const art = p.z > 0.45 ? SOFT[band] : SHARP[band];
+        const d = rad * (p.z > 0.45 ? 6 : 5);
+        c.drawImage(art, p.x - d / 2, p.y - d / 2, d, d);
       }
       c.globalAlpha = 1;
       c.globalCompositeOperation = 'source-over';
