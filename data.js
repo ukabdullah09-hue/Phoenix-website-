@@ -57,7 +57,9 @@ window.STORE = (() => {
 
   const MATTRESS = [
     { id: 'none', name: 'No mattress', note: 'Bed frame only', price: 0 },
-    { id: 'matching', name: 'Matching mattress', note: 'Handmade in the UK, same size as your bed', price: 150, placeholder: true }
+    { id: 'matching', name: 'Matching mattress', note: 'Handmade in the UK, same size as your bed', price: 150, placeholder: true },
+    { id: 'pillow-top', name: 'Pillow-top mattress', note: 'Deep quilted top, same size as your bed', price: 180, placeholder: true },
+    { id: 'slim', name: 'Slim mattress', note: 'Low-profile, same size as your bed', price: 120, placeholder: true }
   ];
 
   const DELIVERY = [

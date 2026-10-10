@@ -4,7 +4,7 @@ window.Art = (() => {
     size: { single: 'images/size-single.png', 'small-double': 'images/size-small-double.png', double: 'images/size-double.png', king: 'images/size-king.png', 'super-king': 'images/size-super-king.png' },
     height: { '54': 'images/headboard-54.png', '60': 'images/headboard-60.png', '75': 'images/headboard-75.png', '80': 'images/headboard-80.png' },
     storage: { standard: 'images/storage-standard.png', underbed: 'images/storage-underbed.png', drawers: 'images/storage-drawers.png', gaslift: 'images/storage-gaslift.png' },
-    mattress: { matching: 'images/mattress-matching.png' },
+    mattress: { matching: 'images/mattress-matching.png', 'pillow-top': 'images/mattress-pillow-top.png', slim: 'images/mattress-slim.png' },
     box: { matching: 'images/box-matching.png', none: 'images/box-none.png' }
   };
   const photo = (group, id) => {

@@ -483,6 +483,7 @@ window.Motion = (() => {
   }
 
   function springObserve(root) {
+    if (!fine) return;
     if (!springIO) {
       springIO = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
