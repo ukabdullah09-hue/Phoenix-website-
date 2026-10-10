@@ -137,7 +137,8 @@ window.Motion = (() => {
     const letters = el.querySelectorAll('.loader__word span i');
     const lockup = [...words, rule, sub];
     const STRIKE = 2.2, END = 4.1;
-    const stopFx = sparks(el.querySelector('.loader__fx'), STRIKE);
+    const beam = el.querySelector('.loader__beam');
+    const stopFx = ash(el.querySelector('.loader__ash'), STRIKE);
     introSound({ strike: STRIKE });
 
     // The page is held back until the intro hands over to it, so the two cross over instead of cutting
@@ -147,14 +148,22 @@ window.Motion = (() => {
     g.set(chrome, { opacity: 0 });
 
     g.timeline({ onComplete: () => { stopFx(); el.remove(); } })
+      // A single line of light strikes, widens, and climbs. Everything else answers to it.
+      .fromTo(beam, { opacity: 0, scaleX: 0.06, scaleY: 1 }, { opacity: 1, scaleX: 1, duration: 1.1, ease: 'expo.out' }, 0.25)
+      .fromTo(beam, { top: '66%' }, { top: '34%', duration: 2.5, ease: 'power2.inOut' }, 0.55)
+      // The light lifts the letters out of the dark as it passes through them
       .fromTo(letters, { yPercent: 118 }, { yPercent: 0, duration: 1.5, ease: 'expo.out', stagger: 0.045 }, STRIKE - 1.05)
       .fromTo(words[0], { letterSpacing: '0.62em', textIndent: '0.62em' }, { letterSpacing: '0.34em', textIndent: '0.34em', duration: 2.2, ease: 'expo.out' }, STRIKE - 1.05)
-      .fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.5, ease: 'expo.out' }, STRIKE - 0.35)
+      // Then it thins, cools and settles into the hairline that sits under the name
+      .to(beam, { scaleX: 0.42, duration: 1.1, ease: 'power2.inOut' }, STRIKE - 0.1)
+      .to(beam, { opacity: 0, scaleX: 0.16, top: '24%', duration: 1, ease: 'power2.in' }, STRIKE + 0.35)
+      .fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.5, ease: 'expo.out' }, STRIKE + 0.1)
       // The glint travels across the name: each letter sweeps its own sheen, a beat after the one before
       .fromTo(letters, { backgroundPosition: '110% 0' }, { backgroundPosition: '-70% 0', duration: 1.25, ease: 'power2.inOut', stagger: 0.06 }, STRIKE + 0.15)
       .fromTo(sub, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 1.3, ease: 'power3.out' }, STRIKE + 0.35)
       // The name drifts back and softens as the page comes forward through it
       .to(lockup, { opacity: 0, scale: 1.12, filter: 'blur(10px)', duration: 1.15, ease: 'power2.inOut' }, END - 0.35)
+      .to(el.querySelector('.loader__ash'), { opacity: 0, duration: 0.9, ease: 'power2.in' }, END - 0.35)
       .to(el, { opacity: 0, duration: 1.25, ease: 'power2.inOut' }, END - 0.15)
       .to(page, { opacity: 1, scale: 1, duration: 1.5, ease: 'expo.out', clearProps: 'transform,opacity' }, END - 0.25)
       .to(chrome, { opacity: 1, duration: 1, ease: 'power2.out', clearProps: 'opacity' }, END + 0.05);
@@ -171,152 +180,32 @@ window.Motion = (() => {
     return heroDelay;
   }
 
-  /* Fire sparks: embers lift through the dark behind the name. What keeps it from looking cheap is
-     depth — a few big ones drift close to you, soft and out of focus, while the small ones sit far
-     back, crisp and bright. They gather toward the name as it lands, then let go. */
-  function sparks(cv, strike) {
-    if (!cv) return () => {};
-    const c = cv.getContext && cv.getContext('2d');
-    if (!c) return () => {};
-    let w = 0, h = 0, raf = 0, last = 0;
-    const SCALE = Math.min(1.5, window.devicePixelRatio || 1);
-    const size = () => {
-      w = cv.clientWidth; h = cv.clientHeight;
-      cv.width = Math.max(1, Math.round(w * SCALE)); cv.height = Math.max(1, Math.round(h * SCALE));
-      c.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-    };
-    size();
-
-    // Each ember is drawn once into a sprite: a hot centre inside a wide halo, from ash red up to
-    // white hot. Drawing a picture costs a phone almost nothing; shading one costs it a frame.
-    const HEAT = [[255, 248, 226], [255, 214, 142], [255, 158, 62], [249, 96, 30], [214, 44, 18], [150, 22, 12]];
-    const sprite = (r, g2, b, soft) => {
-      const sc = document.createElement('canvas');
-      const S = 96;
-      sc.width = sc.height = S;
-      const x = sc.getContext('2d');
-      const gr = x.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
-      if (soft) {
-        gr.addColorStop(0, `rgba(${r},${g2},${b},0.78)`);
-        gr.addColorStop(0.32, `rgba(${r},${g2},${b},0.3)`);
-        gr.addColorStop(0.62, `rgba(${r},${g2},${b},0.08)`);
-      } else {
-        gr.addColorStop(0, 'rgba(255,255,255,1)');
-        gr.addColorStop(0.09, `rgba(${r},${g2},${b},1)`);
-        gr.addColorStop(0.22, `rgba(${r},${g2},${b},0.5)`);
-        gr.addColorStop(0.45, `rgba(${r},${g2},${b},0.12)`);
-      }
-      gr.addColorStop(1, `rgba(${r},${g2},${b},0)`);
-      x.fillStyle = gr;
-      x.fillRect(0, 0, S, S);
-      return sc;
-    };
-    const SHARP = HEAT.map(([r, g2, b]) => sprite(r, g2, b, false));
-    const SOFT = HEAT.map(([r, g2, b]) => sprite(r, g2, b, true));
-
-    const rnd = (a2, z) => a2 + Math.random() * (z - a2);
-    const make = (p, fresh) => {
-      // Depth decides everything: near embers are big, soft and dim, far ones small, sharp and bright
-      p.z = Math.pow(Math.random(), 1.8);
-      // They come off the fire, so they start over it and are carried wider the higher they drift
-      const off = (Math.random() + Math.random() - 1) * w * 0.17;
-      p.x = w / 2 + off + (fresh ? 0 : off * rnd(0, 2.2));
-      p.y = fresh ? h * rnd(0.97, 1.06) : rnd(0.15, 1.05) * h;
-      p.r = (1.1 + p.z * 9) * (h / 760);
-      p.vy = -h * rnd(0.05, 0.14) * (0.45 + p.z * 0.9);
-      p.vx = rnd(-16, 16) * (0.3 + p.z);
-      p.ttl = rnd(2.6, 5.4);
-      p.life = fresh ? 1 : rnd(0.25, 1);
-      p.sway = rnd(0.5, 1.7);
-      p.ph = rnd(0, 6.283);
-      p.flick = rnd(5, 12);
-      p.heat = rnd(0, 1);
-      return p;
-    };
-    const N = Math.max(60, Math.min(140, Math.round(w * h / 5200)));
-    const ps = Array.from({ length: N }, () => make({}, false));
-
-    // A low fire along the foot of the screen, kept small and faint: just enough that the sparks
-    // have somewhere to have come from
-    const lick = (f, fresh) => {
-      const mid = (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
-      f.x = w / 2 + mid * w * 0.17;
-      f.y = h * rnd(1, 1.03);
-      f.vy = -h * rnd(0.13, 0.34);
-      f.vx = rnd(-7, 7) + mid * 10;
-      f.r = h * rnd(0.018, 0.05) * (1 - Math.abs(mid) * 0.45);
-      f.ttl = rnd(0.8, 1.6);
-      f.life = fresh ? 1 : Math.random();
-      f.sway = rnd(1.2, 3);
-      f.ph = rnd(0, 6.283);
-      // A few sit low and burn hot and slow, the way the wood itself glows under the flame
-      f.coal = Math.random() < 0.26;
-      if (f.coal) { f.vy *= 0.26; f.r *= 0.6; f.ttl *= 1.5; }
-      return f;
-    };
-    const FN = Math.max(18, Math.min(32, Math.round(w / 15)));
-    const fs2 = Array.from({ length: FN }, () => lick({}, false));
-
-    const t0 = performance.now();
-    const draw = (now) => {
-      raf = requestAnimationFrame(draw);
-      const dt = Math.min(0.05, (now - (last || now)) / 1000);
-      last = now;
-      const t = (now - t0) / 1000;
-      const rise = Math.min(1, t / (strike * 0.5));
-      const fade = t > strike + 1.2 ? Math.max(0, 1 - (t - strike - 1.2) / 1.4) : 1;
-      const power = rise * fade;
-      const cx = w / 2, cy = h * 0.5;
-      // Drawn toward the name while it forms, released once it has landed
-      const pull = t < strike ? Math.min(1, t / strike) * 26 : 0;
-      const push = t > strike && t < strike + 0.8 ? (1 - (t - strike) / 0.8) * 54 : 0;
-
-      c.clearRect(0, 0, w, h);
-      if (power <= 0.002) { c.globalAlpha = 1; return; }
-      c.globalCompositeOperation = 'lighter';
-
-      for (const f of fs2) {
-        f.life -= dt / f.ttl;
-        if (f.life <= 0) { lick(f, true); continue; }
-        const climb = 1 - f.life;
-        f.x += (f.vx + Math.sin(t * f.sway + f.ph) * 26 * climb) * dt;
-        f.y += f.vy * (0.5 + f.life * 0.7) * dt;
-        // Cools by how high it has got, so the fire is pale only right at its foot
-        const up = Math.max(0, Math.min(1, (h - f.y) / (h * 0.26)));
-        const band = f.coal ? 2 : Math.max(0, Math.min(5, Math.round(2.7 + up * 2.6)));
-        const rad = f.r * (0.45 + f.life * 0.9);
-        // The flame flutters rather than burning evenly, which is what sells it as a real fire
-        const flutter = 0.72 + 0.28 * Math.sin(t * (f.sway * 3.4) + f.ph * 2);
-        c.globalAlpha = Math.min(1, f.life * 1.4) * (f.coal ? 0.3 : 0.22) * flutter * power;
-        c.drawImage(SOFT[band], f.x - rad * 0.8, f.y - rad * 1.9, rad * 1.6, rad * 3.1);
-      }
-
-      for (const p of ps) {
-        p.life -= dt / p.ttl;
-        if (p.life <= 0 || p.y < -h * 0.12) { make(p, true); continue; }
-        const dx = cx - p.x, dy = cy - p.y;
-        const dist = Math.hypot(dx, dy) || 1;
-        p.x += (p.vx + Math.sin(t * p.sway + p.ph) * 14 * (0.4 + p.z) + (dx / dist) * (pull - push)) * dt;
-        p.y += (p.vy + (dy / dist) * (pull - push)) * dt;
-        // Embers cool as they climb, and the near ones sit lower in the fire than the far ones
-        const up = Math.max(0, Math.min(1, (h - p.y) / h));
-        const band = Math.max(0, Math.min(5, Math.round(p.heat * 1.4 + up * 3.2)));
-        // Fades in at birth, out at death, with a slow flicker through the middle
-        const edge = Math.min(1, p.life * 4.5, (1 - p.life) * 6);
-        const flick = 0.78 + 0.22 * Math.sin(t * p.flick + p.ph);
-        const near = 1 - Math.min(1, dist / (h * 0.62));
-        const rad = p.r * (1 + near * 0.3);
-        c.globalAlpha = Math.max(0, edge * flick * (0.62 + (1 - p.z) * 0.38) * (0.7 + near * 0.3)) * power;
-        const art = p.z > 0.45 ? SOFT[band] : SHARP[band];
-        const d = rad * (p.z > 0.45 ? 6 : 5);
-        c.drawImage(art, p.x - d / 2, p.y - d / 2, d, d);
-      }
-      c.globalAlpha = 1;
-      c.globalCompositeOperation = 'source-over';
-    };
-    raf = requestAnimationFrame(draw);
-    window.addEventListener('resize', size);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', size); };
+  /* Ash: a dozen flecks lifting on the heat, lit from below. Few, slow and mostly out of focus, so
+     they read as the air above a fire rather than as a screen full of dots. */
+  function ash(box, strike) {
+    if (!box) return () => {};
+    const rnd = (a, z) => a + Math.random() * (z - a);
+    const tweens = [];
+    const n = window.innerWidth < 560 ? 9 : 14;
+    for (let i = 0; i < n; i++) {
+      const el = document.createElement('i');
+      // Depth: the near ones are bigger, softer and dimmer, the far ones small and sharp
+      const z = Math.pow(Math.random(), 1.7);
+      const d = 1.6 + z * 7;
+      const heat = rnd(0, 1);
+      el.style.width = el.style.height = d.toFixed(1) + 'px';
+      el.style.left = rnd(18, 82).toFixed(1) + '%';
+      el.style.background = `radial-gradient(circle, rgba(255,${(226 - heat * 70).toFixed(0)},${(188 - heat * 130).toFixed(0)},1), rgba(${(228 - heat * 40).toFixed(0)},${(104 - heat * 40).toFixed(0)},40,0) 70%)`;
+      if (z > 0.45) el.style.filter = `blur(${(z * 2.6).toFixed(1)}px)`;
+      box.appendChild(el);
+      const dur = rnd(7, 13) * (1.25 - z * 0.45);
+      tweens.push(g.fromTo(el,
+        { yPercent: 0, y: '102vh', opacity: 0 },
+        { y: '-12vh', opacity: 0.18 + (1 - z) * 0.5, duration: dur, ease: 'none', delay: strike * 0.15 + i * rnd(0.3, 0.8), repeat: -1,
+          repeatRefresh: true, keyframes: undefined }));
+      tweens.push(g.to(el, { xPercent: rnd(-220, 220), duration: rnd(5, 9), ease: 'sine.inOut', yoyo: true, repeat: -1, delay: i * 0.4 }));
+    }
+    return () => tweens.forEach((t) => t.kill());
   }
 
   function intro() {
