@@ -114,7 +114,7 @@
 
   /* ── Home ── */
   function home() {
-    const shown = ['luxury', 'premium', 'kids', 'mattresses'];
+    const shown = ['gaslift', 'luxury', 'premium', 'kids', 'mattresses'];
     const SLIDES = [
       { id: 'celine',  h2: 'Celine Bed.',  sub: 'Made to order in Dewsbury.', pos: '50% 40%' },
       { id: 'sparkle', h2: 'Sparkle Bed.', sub: 'Made to order in Dewsbury.', pos: '50% 50%' },
@@ -157,7 +157,7 @@
         <div class="wrap head head--center"><h2 id="loved-t" data-brighten>Most loved.</h2><p>Our most popular beds.</p>
           <div class="seg" role="tablist" aria-label="Most loved"><button type="button" role="tab" id="tb-beds" aria-selected="true" aria-controls="pn-beds">Beds</button><button type="button" role="tab" id="tb-matt" aria-selected="false" aria-controls="pn-matt">Mattresses</button></div>
         </div>
-        <div class="rail" id="pn-beds" role="tabpanel" aria-labelledby="tb-beds">${byPop(S.PRODUCTS).slice(0, 8).map(card).join('')}<a class="card card--more" href="#shop"><div><h3>All ${S.PRODUCTS.length} beds.</h3><p>Luxury, premium, kids and mattresses.</p></div></a></div>
+        <div class="rail" id="pn-beds" role="tabpanel" aria-labelledby="tb-beds">${byPop(S.PRODUCTS).slice(0, 8).map(card).join('')}<a class="card card--more" href="#shop"><div><h3>All ${S.PRODUCTS.length} beds.</h3><p>Gaslift and drawers, luxury, premium, kids and mattresses.</p></div></a></div>
         <div class="wrap" id="pn-matt" role="tabpanel" aria-labelledby="tb-matt" hidden><div class="empty" style="background:#fff"><h3 style="font-size:1.5rem">Mattress range to be supplied.</h3><p class="muted">For now, add a matching handmade mattress to any bed when you order.</p></div></div>
       </section>
 

@@ -11,6 +11,7 @@ window.STORE = (() => {
   ];
 
   const CATEGORIES = [
+    { id: 'gaslift', name: 'Gaslift and drawers', short: 'Gaslift & drawers', line: 'Storage that lifts or slides out.', photo: 'images/storage-gaslift.png' },
     { id: 'luxury', name: 'Luxury beds', short: 'Luxury', line: 'Tall headboards, deep tufting.', photo: 'images/beds/grandeur-1.jpg' },
     { id: 'premium', name: 'Premium beds', short: 'Premium', line: 'Statement shapes, every size.', photo: 'images/beds/celine-1.jpg' },
     { id: 'kids', name: 'Kids beds', short: 'Kids', line: 'Made for growing up in.', photo: 'images/beds/daisy-1.jpg' },
