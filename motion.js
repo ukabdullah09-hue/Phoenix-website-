@@ -218,11 +218,13 @@ window.Motion = (() => {
     const make = (p, fresh) => {
       // Depth decides everything: near embers are big, soft and dim, far ones small, sharp and bright
       p.z = Math.pow(Math.random(), 1.8);
-      p.x = rnd(-0.08, 1.08) * w;
-      p.y = fresh ? h * rnd(1, 1.12) : rnd(0.15, 1.1) * h;
+      // They come off the fire, so they start over it and are carried wider the higher they drift
+      const off = (Math.random() + Math.random() - 1) * w * 0.17;
+      p.x = w / 2 + off + (fresh ? 0 : off * rnd(0, 2.2));
+      p.y = fresh ? h * rnd(0.97, 1.06) : rnd(0.15, 1.05) * h;
       p.r = (1.1 + p.z * 9) * (h / 760);
       p.vy = -h * rnd(0.05, 0.14) * (0.45 + p.z * 0.9);
-      p.vx = rnd(-10, 10) * (0.3 + p.z);
+      p.vx = rnd(-16, 16) * (0.3 + p.z);
       p.ttl = rnd(2.6, 5.4);
       p.life = fresh ? 1 : rnd(0.25, 1);
       p.sway = rnd(0.5, 1.7);
@@ -237,19 +239,22 @@ window.Motion = (() => {
     // A low fire along the foot of the screen, kept small and faint: just enough that the sparks
     // have somewhere to have come from
     const lick = (f, fresh) => {
-      const mid = (Math.random() + Math.random() - 1);
-      f.x = w / 2 + mid * w * 0.44;
-      f.y = h * rnd(1, 1.04);
-      f.vy = -h * rnd(0.1, 0.24);
-      f.vx = rnd(-8, 8);
-      f.r = h * rnd(0.016, 0.042) * (1 - Math.abs(mid) * 0.4);
-      f.ttl = rnd(0.9, 1.7);
+      const mid = (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+      f.x = w / 2 + mid * w * 0.17;
+      f.y = h * rnd(1, 1.03);
+      f.vy = -h * rnd(0.13, 0.34);
+      f.vx = rnd(-7, 7) + mid * 10;
+      f.r = h * rnd(0.018, 0.05) * (1 - Math.abs(mid) * 0.45);
+      f.ttl = rnd(0.8, 1.6);
       f.life = fresh ? 1 : Math.random();
-      f.sway = rnd(1, 2.6);
+      f.sway = rnd(1.2, 3);
       f.ph = rnd(0, 6.283);
+      // A few sit low and burn hot and slow, the way the wood itself glows under the flame
+      f.coal = Math.random() < 0.26;
+      if (f.coal) { f.vy *= 0.26; f.r *= 0.6; f.ttl *= 1.5; }
       return f;
     };
-    const FN = Math.max(16, Math.min(32, Math.round(w / 16)));
+    const FN = Math.max(18, Math.min(32, Math.round(w / 15)));
     const fs2 = Array.from({ length: FN }, () => lick({}, false));
 
     const t0 = performance.now();
@@ -277,10 +282,12 @@ window.Motion = (() => {
         f.x += (f.vx + Math.sin(t * f.sway + f.ph) * 26 * climb) * dt;
         f.y += f.vy * (0.5 + f.life * 0.7) * dt;
         // Cools by how high it has got, so the fire is pale only right at its foot
-        const up = Math.max(0, Math.min(1, (h - f.y) / (h * 0.3)));
-        const band = Math.max(0, Math.min(5, Math.round(2.2 + up * 3)));
+        const up = Math.max(0, Math.min(1, (h - f.y) / (h * 0.26)));
+        const band = f.coal ? 2 : Math.max(0, Math.min(5, Math.round(2.7 + up * 2.6)));
         const rad = f.r * (0.45 + f.life * 0.9);
-        c.globalAlpha = Math.min(1, f.life * 1.4) * 0.24 * power;
+        // The flame flutters rather than burning evenly, which is what sells it as a real fire
+        const flutter = 0.72 + 0.28 * Math.sin(t * (f.sway * 3.4) + f.ph * 2);
+        c.globalAlpha = Math.min(1, f.life * 1.4) * (f.coal ? 0.3 : 0.22) * flutter * power;
         c.drawImage(SOFT[band], f.x - rad * 0.8, f.y - rad * 1.9, rad * 1.6, rad * 3.1);
       }
 
