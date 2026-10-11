@@ -226,7 +226,8 @@
   /* ── Shop: everything at a glance, filtered and sorted in place ── */
   let shopCtl = null;
   const SORTS = [['popular', 'Popular'], ['low', 'Lowest price'], ['high', 'Highest price']];
-  const dense = () => (keep.get('grid', 'dense') === 'large' ? 'large' : 'dense');
+  // Phones open on the bigger photos; wider screens still open dense. A saved choice always wins.
+  const dense = () => (keep.get('grid', window.matchMedia('(max-width: 639px)').matches ? 'large' : 'dense') === 'large' ? 'large' : 'dense');
   const ALL_COVER = 'images/beds/celine-1.jpg';
   const cover = (C) => (C && C.photo) || ALL_COVER;
   function shop(c) {
