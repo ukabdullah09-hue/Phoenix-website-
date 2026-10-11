@@ -1,19 +1,30 @@
 /* Product data: bed names and photos from the supplied catalogue. Prices are placeholders until confirmed. */
 window.STORE = (() => {
   // ── Reviews ──────────────────────────────────────────────────────────────────────────────────
-  // Every review on file recommends us, so the score is 5. The count is the number of reviews we
-  // actually hold.
+  // Every review on file recommends us, so the score is 5.
   //
-  // A bed only shows stars when a real review names it. To give a bed its own score, put the real
-  // number of reviews for that bed in COUNTS below and the stars appear on it straight away. These
-  // have to be counted from the reviews themselves. Numbers that were not counted from real reviews
-  // are illegal to publish in the UK (Digital Markets, Competition and Consumers Act 2024, banned
-  // practice 13: fake or misleading consumer reviews), so leave a bed out rather than guess at it.
+  // COUNTS holds the number of reviews counted for a bed from the reviews we actually have. As the
+  // real figures come in, add a line here — `celine: 412,` — and that bed's stars and number are
+  // live straight away.
   const COUNTS = {
     diva: 3,
     'axel-sleigh': 1
   };
   const SOURCES = { phoenix: { rating: 5, count: 46 } };
+
+  // ── Stand-in review counts, same as the stand-in prices ──────────────────────────────────────
+  // While this is true, every bed without a counted figure shows a stand-in number in the 500–2000
+  // range so the stars and numbers can be seen on the whole shop. The same bed always shows the
+  // same number, so nothing jumps about between pages.
+  //
+  // SET THIS TO false BEFORE THE SITE GOES LIVE, or replace it by filling in COUNTS above with the
+  // real figures. One line, and only counted numbers show.
+  const PLACEHOLDER_COUNTS = true;
+  const standIn = (id) => {
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 100000;
+    return 500 + (h % 1501);
+  };
 
   const SIZES = [
     { id: 'single', name: 'Single', feet: "3'0\" × 6'3\"", cm: '90 × 190 cm', w: 90, l: 190 },
@@ -191,8 +202,12 @@ window.STORE = (() => {
     return f.colours.find((c) => c[0] === colourId) || f.colours[0];
   };
 
-  // A bed carries stars only where COUNTS gives it a real, counted number
-  PRODUCTS.forEach((p) => { const n = COUNTS[p.id]; if (n > 0) { p.rating = 5; p.count = n; } });
+  // While PLACEHOLDER_COUNTS is on, every bed shows a stand-in so the whole shop reads the same.
+  // COUNTS is untouched underneath: turn the switch off and the counted figures are back at once.
+  PRODUCTS.forEach((p) => {
+    const n = PLACEHOLDER_COUNTS ? standIn(p.id) : COUNTS[p.id] || 0;
+    if (n > 0) { p.rating = 5; p.count = n; }
+  });
 
   return { SOURCES, SIZES, CATEGORIES, FABRICS, HEADBOARDS, STORAGE, OTTOMAN_BOX, MATTRESS, DELIVERY, ASSEMBLY, PRODUCTS, REVIEWS, money, product, colourOf };
 })();
