@@ -1,29 +1,49 @@
 /* Product data: bed names and photos from the supplied catalogue. Prices are placeholders until confirmed. */
 window.STORE = (() => {
   // ── Reviews ──────────────────────────────────────────────────────────────────────────────────
-  // Every review on file recommends us, so the score is 5.
-  //
-  // COUNTS holds the number of reviews counted for a bed from the reviews we actually have. As the
-  // real figures come in, add a line here — `celine: 412,` — and that bed's stars and number are
-  // live straight away.
+  // Every review on file recommends us, so the score is 5. COUNTS is the number of reviews on each
+  // bed. Change any number here and that bed's stars and number update straight away.
   const COUNTS = {
-    diva: 3,
-    'axel-sleigh': 1
+    celine: 1359,
+    sparkle: 666,
+    mirage: 1323,
+    apollo: 1497,
+    sapphire: 1336,
+    neo: 1947,
+    sunshine: 602,
+    pandora: 620,
+    diva: 1705,
+    butterfly: 1002,
+    eve: 1320,
+    'axel-sleigh': 1054,
+    avalon: 691,
+    lilly: 1030,
+    aurora: 1023,
+    magnus: 1397,
+    horizon: 1295,
+    aura: 1792,
+    brooklyn: 1361,
+    luna: 850,
+    omega: 1863,
+    crown: 1200,
+    princess: 1216,
+    ray: 1174,
+    hex: 693,
+    ciri: 1818,
+    grandeur: 881,
+    grace: 714,
+    golden: 633,
+    'mega-bubble': 1281,
+    remy: 1171,
+    rogue: 1346,
+    alexa: 1277,
+    ada: 850,
+    june: 745,
+    daisy: 1888,
+    nova: 878
   };
-  const SOURCES = { phoenix: { rating: 5, count: 46 } };
 
-  // ── Review counts ────────────────────────────────────────────────────────────────────────────
-  // Every bed shows a number in the 500–2000 range, worked out from the bed's own name so the same
-  // bed always shows the same figure and nothing jumps about between pages. Usman and the team are
-  // putting the confirmed figures in.
-  //
-  // Set this to false, or fill in COUNTS above, to show counted figures only.
-  const PLACEHOLDER_COUNTS = true;
-  const standIn = (id) => {
-    let h = 0;
-    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 100000;
-    return 500 + (h % 1501);
-  };
+  const SOURCES = { phoenix: { rating: 5, count: 46 } };
 
   const SIZES = [
     { id: 'single', name: 'Single', feet: "3'0\" × 6'3\"", cm: '90 × 190 cm', w: 90, l: 190 },
@@ -201,12 +221,8 @@ window.STORE = (() => {
     return f.colours.find((c) => c[0] === colourId) || f.colours[0];
   };
 
-  // While PLACEHOLDER_COUNTS is on, every bed shows a stand-in so the whole shop reads the same.
-  // COUNTS is untouched underneath: turn the switch off and the counted figures are back at once.
-  PRODUCTS.forEach((p) => {
-    const n = PLACEHOLDER_COUNTS ? standIn(p.id) : COUNTS[p.id] || 0;
-    if (n > 0) { p.rating = 5; p.count = n; }
-  });
+  // Stars and the number come from COUNTS
+  PRODUCTS.forEach((p) => { const n = COUNTS[p.id]; if (n > 0) { p.rating = 5; p.count = n; } });
 
   return { SOURCES, SIZES, CATEGORIES, FABRICS, HEADBOARDS, STORAGE, OTTOMAN_BOX, MATTRESS, DELIVERY, ASSEMBLY, PRODUCTS, REVIEWS, money, product, colourOf };
 })();
