@@ -112,9 +112,11 @@
     ['Is there a warranty?', 'Every bed comes with a 24-month warranty on the frame and stitching.'],
     ['Can I return a bed?', 'Beds made to custom dimensions can\'t be returned, so please double-check your measurements. Our full returns policy is to be supplied.']
   ];
+  // Reviews with a photo, and more to say, lead
+  const byTell = (a, b) => (b.photo ? 1 : 0) - (a.photo ? 1 : 0) || b.text.length - a.text.length;
   function reviewCards(list) {
     if (!list.length) return '<p class="muted" style="text-align:center">Customer reviews to be supplied.</p>';
-    return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review">${meter(r.stars)}<blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.via ? ` · via ${esc(r.via)}` : ''}</footer></figure>`).join('')}</div>`;
+    return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review${r.photo ? ' review--shot' : ''}">${r.photo ? `<span class="review__shot shot" style="--shot:url('${r.photo}-420.jpg')"><img src="${r.photo}-420.jpg" srcset="${r.photo}-420.jpg 420w, ${r.photo}-840.jpg 840w" sizes="(min-width: 640px) 30vw, 88vw" alt="The bed ${esc(r.name)} bought, in their own home" loading="lazy" decoding="async"></span>` : ''}${meter(r.stars)}<blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.via ? ` · via ${esc(r.via)}` : ''}</footer></figure>`).join('')}</div>`;
   }
   const scores = () => Object.keys(S.SOURCES).length ? `<div class="scores" data-stagger>${Object.values(S.SOURCES).map((s) => `<div class="score"><b data-count-to="${s.rating}">${s.rating.toFixed(1)}</b>${meter(s.rating)}<span class="muted">From ${fmt(s.count)} customer reviews</span></div>`).join('')}</div>` : '';
 
@@ -201,7 +203,7 @@
         <div class="wrap">
           <div class="head head--center"><h2 id="homes-t" data-brighten>What customers say.</h2>
             ${S.SOURCES.phoenix ? `<p class="rating rating--lead"><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 from ${fmt(S.SOURCES.phoenix.count)} reviews.</span>${meter(S.SOURCES.phoenix.rating)}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)} from ${fmt(S.SOURCES.phoenix.count)} reviews</span></p>` : ''}</div>
-          ${reviewCards(S.REVIEWS.slice(0, 6))}
+          ${reviewCards(S.REVIEWS.slice().sort(byTell).slice(0, 6))}
           <p style="text-align:center;margin-top:1.2rem"><a class="btn btn--line" href="#reviews"><span class="lbl">Read all ${fmt(S.REVIEWS.length)} reviews</span></a></p>
           ${scores()}
           <p style="text-align:center;margin-top:1.5rem"><a class="link" href="#reviews">Read all reviews</a></p>
@@ -701,7 +703,7 @@
       title: 'Reviews | Phoenix Beds',
       html: `<section class="section" style="padding-top:clamp(2rem,5vw,3.5rem)"><div class="wrap wrap--wide">
         <div class="head head--center"><h1 class="page-h1" data-hero-title>Customer reviews.</h1><p data-hero-after>Every review here was left by a Phoenix Beds customer on Facebook, Messenger, Instagram or WhatsApp.</p></div>
-        ${scores()}<div style="height:12px"></div>${reviewCards(S.REVIEWS)}
+        ${scores()}<div style="height:12px"></div>${reviewCards(S.REVIEWS.slice().sort(byTell))}
         <div class="head head--center" style="margin-top:3rem"><h2 data-brighten>Ratings by bed.</h2></div>
         <div class="grid-compact" data-stagger>${byPop(S.PRODUCTS).map((p) => compactCard(p, false)).join('')}</div>
       </div></section>`
