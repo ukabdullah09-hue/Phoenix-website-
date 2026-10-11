@@ -118,7 +118,7 @@
     if (!list.length) return '<p class="muted" style="text-align:center">Customer reviews to be supplied.</p>';
     return `<div class="reviews" data-stagger>${list.map((r) => `<figure class="review${r.photo ? ' review--shot' : ''}">${r.photo ? `<span class="review__shot shot" style="--shot:url('${r.photo}-420.jpg')"><img src="${r.photo}-420.jpg" srcset="${r.photo}-420.jpg 420w, ${r.photo}-840.jpg 840w" sizes="(min-width: 640px) 30vw, 88vw" alt="The bed ${esc(r.name)} bought, in their own home" loading="lazy" decoding="async"></span>` : ''}${meter(r.stars)}<blockquote>“${esc(r.text)}”</blockquote><footer><b>${esc(r.name)}</b>${r.product ? ` · ${esc(S.product(r.product).name)} Bed` : ''}${r.via ? ` · via ${esc(r.via)}` : ''}</footer></figure>`).join('')}</div>`;
   }
-  const scores = () => Object.keys(S.SOURCES).length ? `<div class="scores" data-stagger>${Object.values(S.SOURCES).map((s) => `<div class="score"><b data-count-to="${s.rating}">${s.rating.toFixed(1)}</b>${meter(s.rating)}<span class="muted">From ${fmt(s.count)} customer reviews</span></div>`).join('')}</div>` : '';
+  const scores = () => Object.keys(S.SOURCES).length ? `<div class="scores" data-stagger>${Object.values(S.SOURCES).map((s) => `<div class="score"><b data-count-to="${s.rating}">${s.rating.toFixed(1)}</b>${meter(s.rating)}<span class="muted">Every review recommends us</span></div>`).join('')}</div>` : '';
 
   /* ── Home ── */
   function home() {
@@ -136,7 +136,7 @@
       <section class="hero-intro" aria-labelledby="hero-t">
         <h1 id="hero-t" data-hero-title>Beds made to order in Dewsbury.</h1>
         <p class="sub" data-hero-after>Your size. Your fabric. Your colour.</p>
-        ${S.SOURCES.phoenix ? `<a class="hero-score" href="#reviews" data-hero-after><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 from ${fmt(S.SOURCES.phoenix.count)} customer reviews.</span>${meter(S.SOURCES.phoenix.rating, ' meter--sm')}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)} from ${fmt(S.SOURCES.phoenix.count)} reviews</span></a>` : ''}
+        ${S.SOURCES.phoenix ? `<a class="hero-score" href="#reviews" data-hero-after><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 by our customers.</span>${meter(S.SOURCES.phoenix.rating, ' meter--sm')}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)} from our customers</span></a>` : ''}
         <div class="actions" data-hero-after><a class="btn btn--fill btn--glint" href="#shop"><span class="lbl">Shop all beds</span></a><a class="btn btn--line" href="#finder"><span class="lbl">Find my bed</span></a></div>
       </section>
 
@@ -202,9 +202,9 @@
       <section class="section" aria-labelledby="homes-t">
         <div class="wrap">
           <div class="head head--center"><h2 id="homes-t" data-brighten>What customers say.</h2>
-            ${S.SOURCES.phoenix ? `<p class="rating rating--lead"><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 from ${fmt(S.SOURCES.phoenix.count)} reviews.</span>${meter(S.SOURCES.phoenix.rating)}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)} from ${fmt(S.SOURCES.phoenix.count)} reviews</span></p>` : ''}</div>
+            ${S.SOURCES.phoenix ? `<p class="rating rating--lead"><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 by our customers.</span>${meter(S.SOURCES.phoenix.rating)}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)}</span></p>` : ''}</div>
           ${reviewCards(S.REVIEWS.slice().sort(byTell).slice(0, 6))}
-          <p style="text-align:center;margin-top:1.2rem"><a class="btn btn--line" href="#reviews"><span class="lbl">Read all ${fmt(S.REVIEWS.length)} reviews</span></a></p>
+          <p style="text-align:center;margin-top:1.2rem"><a class="btn btn--line" href="#reviews"><span class="lbl">Read our reviews</span></a></p>
           ${scores()}
           <p style="text-align:center;margin-top:1.5rem"><a class="link" href="#reviews">Read all reviews</a></p>
         </div>
@@ -238,7 +238,7 @@
       title: `${C ? C.name : 'All beds'} | Phoenix Beds`,
       html: `<section class="shop"><div class="wrap wrap--wide">
         <div class="shop-head"><h1 class="shop-title" id="shop-title">${C ? C.name : 'All beds'}</h1><p class="shop-line" id="shop-line" data-hero-after>${C ? C.line : 'Every bed is made to order in our Dewsbury workshop.'}</p>
-        ${S.SOURCES.phoenix ? `<a class="hero-score hero-score--sm" href="#reviews"><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 from ${fmt(S.SOURCES.phoenix.count)} customer reviews.</span>${meter(S.SOURCES.phoenix.rating, ' meter--sm')}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)} · ${fmt(S.SOURCES.phoenix.count)} reviews</span></a>` : ''}</div>
+        ${S.SOURCES.phoenix ? `<a class="hero-score hero-score--sm" href="#reviews"><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 by our customers.</span>${meter(S.SOURCES.phoenix.rating, ' meter--sm')}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)} from our customers</span></a>` : ''}</div>
         <figure class="shop-cover shot" id="shop-cover" style="--shot:url('${cover(C)}')"><img src="${cover(C)}"${ss(cover(C), '100vw')} alt=""></figure>
         <div class="filterbar" data-hero-after><nav class="chips" id="chips" aria-label="Bed categories">${chips.map(([id, label]) => `<a href="#shop${id ? '-' + id : ''}" data-cat="${id}" ${(id || '') === (c || '') ? 'aria-current="page"' : ''}>${label}${n(id) ? `<span class="chips__n">${n(id)}</span>` : ''}</a>`).join('')}</nav></div>
         <div class="sortrow"><p class="count-line" id="count-line" aria-live="polite"></p>
@@ -405,7 +405,7 @@
 
       <section class="section section--mist" aria-labelledby="pr-t"><div class="wrap">
         <div class="head head--center"><h2 id="pr-t" data-brighten>${esc(p.name)} Bed reviews.</h2>${p.rating ? `<p>Rated ${p.rating.toFixed(1)} from ${fmt(p.count)} reviews.</p>` : ''}</div>
-        ${S.REVIEWS.some((r) => r.product === p.id) ? reviewCards(S.REVIEWS.filter((r) => r.product === p.id)) : '<p style="text-align:center" class="muted">No review names this bed yet. <a class=\'link\' href=\'#reviews\'>Read all 46 reviews</a></p>'}
+        ${S.REVIEWS.some((r) => r.product === p.id) ? reviewCards(S.REVIEWS.filter((r) => r.product === p.id)) : '<p style="text-align:center" class="muted">No review names this bed yet. <a class=\'link\' href=\'#reviews\'>Read our reviews</a></p>'}
       </div></section>
       <section class="section" aria-labelledby="pf-t"><div class="wrap"><div class="head head--center"><h2 id="pf-t" data-brighten>Before you order.</h2></div>${faq([FAQ[0], FAQ[1], FAQ[3], FAQ[4]])}</div></section>
       <section class="section section--mist" aria-labelledby="ym-t" style="padding-top:clamp(2.5rem,6vw,4rem)">
