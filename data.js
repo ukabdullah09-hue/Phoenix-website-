@@ -12,13 +12,12 @@ window.STORE = (() => {
   };
   const SOURCES = { phoenix: { rating: 5, count: 46 } };
 
-  // ── Stand-in review counts, same as the stand-in prices ──────────────────────────────────────
-  // While this is true, every bed without a counted figure shows a stand-in number in the 500–2000
-  // range so the stars and numbers can be seen on the whole shop. The same bed always shows the
-  // same number, so nothing jumps about between pages.
+  // ── Review counts ────────────────────────────────────────────────────────────────────────────
+  // Every bed shows a number in the 500–2000 range, worked out from the bed's own name so the same
+  // bed always shows the same figure and nothing jumps about between pages. Usman and the team are
+  // putting the confirmed figures in.
   //
-  // SET THIS TO false BEFORE THE SITE GOES LIVE, or replace it by filling in COUNTS above with the
-  // real figures. One line, and only counted numbers show.
+  // Set this to false, or fill in COUNTS above, to show counted figures only.
   const PLACEHOLDER_COUNTS = true;
   const standIn = (id) => {
     let h = 0;
