@@ -145,22 +145,26 @@ window.Motion = (() => {
     const chrome = document.querySelectorAll('.tabbar, .wa');
     g.set(page, { opacity: 0, scale: 1.1, transformOrigin: '50% 42%' });
     g.set(chrome, { opacity: 0 });
+    // Hand the compositor its layers up front. Building them part-way through a move is what causes
+    // the single dropped frame you feel as a stutter.
+    const inner = el.querySelector('.loader__inner');
+    g.set([inner, warm, ...page], { willChange: 'transform, opacity', force3D: true });
 
-    g.timeline({ onComplete: () => el.remove() })
+    g.timeline({ onComplete: () => { el.remove(); g.set(page, { clearProps: 'willChange' }); } })
       // The name simply resolves: no trick, just a long settle from a touch too close and too soft
       .fromTo(letters, { yPercent: 115 }, { yPercent: 0, duration: 1.5, ease: 'expo.out', stagger: 0.03 }, 0.3)
-      .fromTo(el.querySelector('.loader__inner'), { scale: 1.08, filter: 'blur(7px)' },
-        { scale: 1, filter: 'blur(0px)', duration: 2, ease: 'expo.out' }, 0.3)
+      .fromTo(inner, { scale: 1.08, filter: 'blur(7px)' },
+        { scale: 1, filter: 'blur(0px)', duration: 2, ease: 'expo.out', force3D: true }, 0.3)
       .fromTo(warm, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 2.4, ease: 'power2.out' }, 0.2)
       // One pass of light across the metal, and then the rule and the line beneath it
       .fromTo(letters, { backgroundPosition: '110% 0' }, { backgroundPosition: '-70% 0', duration: 1.3, ease: 'power2.inOut', stagger: 0.05 }, SHEEN)
       .fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.4, ease: 'expo.out' }, SHEEN + 0.15)
       .fromTo(sub, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }, SHEEN + 0.4)
       // Then the shop is not cut to, it is arrived at: the name comes at you and you pass through it
-      .to(el.querySelector('.loader__inner'), { scale: 9, opacity: 0, filter: 'blur(9px)', duration: 1.45, ease: 'power2.in' }, FLY)
-      .to(warm, { scale: 2.4, opacity: 0, duration: 1.45, ease: 'power2.in' }, FLY)
+      .to(inner, { scale: 9, opacity: 0, filter: 'blur(9px)', duration: 1.45, ease: 'power2.in', force3D: true }, FLY)
+      .to(warm, { scale: 2.4, opacity: 0, duration: 1.45, ease: 'power2.in', force3D: true }, FLY)
       .to(el, { opacity: 0, duration: 1.05, ease: 'power2.inOut' }, FLY + 0.3)
-      .to(page, { opacity: 1, scale: 1, duration: 1.7, ease: 'expo.out', clearProps: 'transform,opacity' }, FLY + 0.22)
+      .to(page, { opacity: 1, scale: 1, duration: 1.7, ease: 'expo.out', force3D: true, clearProps: 'transform,opacity' }, FLY + 0.22)
       .to(chrome, { opacity: 1, duration: 1, ease: 'power2.out', clearProps: 'opacity' }, FLY + 0.65);
 
     // The page is hidden until the intro hands over, so make sure it can never stay hidden
@@ -495,10 +499,6 @@ window.Motion = (() => {
       // Each card rises and settles while its photo eases out of a zoom
       const gd = d0 + (first ? 0.3 : 0.06);
       g.from(now, { y: 56, opacity: 0, scale: 0.92, duration: 1, ease: 'expo.out', stagger: 0.05, delay: gd, clearProps: 'transform,opacity' });
-      now.forEach((c, i) => {
-        const im = c.querySelector('.card__img img');
-        if (im) g.fromTo(im, { scale: 1.35, transition: 'none' }, { scale: 1, duration: 1.5, ease: 'expo.out', delay: gd + i * 0.05, clearProps: 'transform,transition' });
-      });
       if (later.length) {
         g.set(later, { y: 46, opacity: 0, scale: 0.94 });
         box._batch = ST.batch(later, { start: 'top 96%', once: true, onEnter: (els) => g.to(els, { y: 0, opacity: 1, scale: 1, duration: 0.7, ease: 'power3.out', stagger: 0.07, clearProps: 'transform,opacity' }) });
@@ -531,12 +531,9 @@ window.Motion = (() => {
 
     morphEnd(root.querySelector('#hero-figure'));
 
-    root.querySelectorAll('img').forEach((img) => { if (!img.complete) img.addEventListener('load', refreshSoon, { once: true }); });
     requestAnimationFrame(() => ST.refresh());
   }
 
-  let refreshT = 0;
-  const refreshSoon = () => { clearTimeout(refreshT); refreshT = setTimeout(() => ST.refresh(), 200); };
 
   /* Gold stars fill to the real score when they scroll into view */
   function meters(root) {
@@ -1217,12 +1214,37 @@ window.Motion = (() => {
     while (view.firstChild) held.appendChild(view.firstChild);
     ghost.appendChild(held);
     document.body.appendChild(ghost);
+    // Both layers are handed to the compositor before anything moves, so neither is built mid-move
+    // Both layers are handed to the compositor before anything moves, so neither is built mid-move
+    g.set([ghost, held, view], { willChange: 'transform, opacity', force3D: true });
 
+    // Build the new page while the old one is still held on screen and nothing is moving. Building a
+    // page is the most expensive thing the browser does here, and doing it part-way through the fade
+    // was costing a fifth of a second of dropped frames. Now the fade only ever starts once the new
+    // page is built and painted, so it runs clean from its first frame to its last.
+    g.set(view, { opacity: 0 });
     swap();
-    g.timeline({ onComplete: () => { ghost.remove(); ST.refresh(); } })
-      .to(ghost, { opacity: 0, duration: 0.55, ease: 'power2.inOut' }, 0)
-      .to(held, { scale: 1.025, y: -10, duration: 0.55, ease: 'power2.in' }, 0)
-      .fromTo(view, { opacity: 0 }, { opacity: 1, duration: 0.45, ease: 'power2.out', clearProps: 'opacity' }, 0.06);
+    requestAnimationFrame(() => {
+      // Measuring the new page for scroll effects is the other expensive job. Get it done here, while
+      // the old page is still held still, rather than letting it land in the middle of the fade.
+      ST.refresh();
+      // Let the photos on the first screen finish decoding before anything moves. Decoding them
+      // part-way through the fade is what was costing dropped frames; the page you are leaving is
+      // still held on screen while this happens, so all it costs is a fraction of a second nobody
+      // sees. Capped, so a slow photo can never hold the page up.
+      const fold = window.innerHeight * 1.15;
+      const ready = [...view.querySelectorAll('img')]
+        .filter((im) => im.getBoundingClientRect().top < fold)
+        .slice(0, 10)
+        .map((im) => (im.decode ? im.decode().catch(() => {}) : Promise.resolve()));
+      Promise.race([Promise.all(ready), new Promise((r) => setTimeout(r, 260))]).then(() => {
+      if (!ghost.isConnected) return;
+      g.timeline({ onComplete: () => { ghost.remove(); g.set(view, { clearProps: 'willChange' }); } })
+        .to(ghost, { opacity: 0, duration: 0.55, ease: 'power2.inOut', force3D: true }, 0)
+        .to(held, { scale: 1.025, y: -10, duration: 0.55, ease: 'power2.in', force3D: true }, 0)
+        .to(view, { opacity: 1, duration: 0.45, ease: 'power2.out', force3D: true, clearProps: 'opacity' }, 0.06);
+      });
+    });
   }
 
   function sheet(el, open) {
