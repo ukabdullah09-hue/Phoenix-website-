@@ -806,6 +806,24 @@
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheetEl.hidden) { closeWa(); waBtn.focus(); } });
   window.addEventListener('resize', () => { const bar = document.getElementById('buybar'); if (bar) document.body.style.setProperty('--buybar-h', bar.offsetHeight + 'px'); });
   window.addEventListener('hashchange', () => render());
+  // The chat button steps aside while someone reads down the page and comes back on the way up
+  // (or when they stop), so it never sits over a price or a button. It stays put while the chat is open.
+  let lastY = scrollY, idle = 0, ticking = false;
+  const showWa = () => document.body.classList.remove('wa-away');
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const y = scrollY, dy = y - lastY;
+      lastY = y;
+      if (!sheetEl.hidden) return showWa();
+      if (y < 160 || dy < -4) showWa();
+      else if (dy > 4) document.body.classList.add('wa-away');
+      clearTimeout(idle);
+      idle = setTimeout(showWa, 1400);
+    });
+  }, { passive: true });
 
   counts();
   M.loader();
