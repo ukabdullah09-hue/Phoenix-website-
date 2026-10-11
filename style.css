@@ -630,6 +630,9 @@ body.has-buybar { padding-bottom: var(--buybar-h, 76px); }
 .ghost { position: fixed; left: 0; right: 0; bottom: 0; z-index: 38; overflow: hidden; pointer-events: none; background: var(--white); }
 .ghost__in { position: absolute; left: 0; right: 0; transform-origin: 50% 18%; }
 
+.rating--lead { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; color: var(--ink-2); }
+.rating--lead .meter { font-size: 1.3rem; }
+
 /* Intro sound */
 .mutebtn { position: fixed; z-index: 101; right: calc(env(safe-area-inset-right, 0px) + 14px); top: calc(env(safe-area-inset-top, 0px) + 14px); width: 42px; height: 42px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .1); color: #efe9e0; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); cursor: pointer; }
 .mutebtn[hidden] { display: none; }
