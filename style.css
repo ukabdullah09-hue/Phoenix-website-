@@ -630,6 +630,9 @@ body.has-buybar { padding-bottom: var(--buybar-h, 76px); }
 .ghost { position: fixed; left: 0; right: 0; bottom: 0; z-index: 38; overflow: hidden; pointer-events: none; background: var(--white); }
 .ghost__in { position: absolute; left: 0; right: 0; transform-origin: 50% 18%; }
 
+.hero-score { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.4rem 0.9rem; border-radius: 980px; background: var(--mist); color: var(--ink-2); font-size: 0.86rem; font-weight: 500; text-decoration: none; }
+.hero-score:hover { background: var(--mist-2); }
+.hero-score--sm { margin-top: 0.35rem; font-size: 0.8rem; padding: 0.3rem 0.7rem; }
 .rating--lead { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; color: var(--ink-2); }
 .rating--lead .meter { font-size: 1.3rem; }
 

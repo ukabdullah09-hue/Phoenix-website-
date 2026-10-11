@@ -134,6 +134,7 @@
       <section class="hero-intro" aria-labelledby="hero-t">
         <h1 id="hero-t" data-hero-title>Beds made to order in Dewsbury.</h1>
         <p class="sub" data-hero-after>Your size. Your fabric. Your colour.</p>
+        ${S.SOURCES.phoenix ? `<a class="hero-score" href="#reviews" data-hero-after><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 from ${fmt(S.SOURCES.phoenix.count)} customer reviews.</span>${meter(S.SOURCES.phoenix.rating, ' meter--sm')}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)} from ${fmt(S.SOURCES.phoenix.count)} reviews</span></a>` : ''}
         <div class="actions" data-hero-after><a class="btn btn--fill btn--glint" href="#shop"><span class="lbl">Shop all beds</span></a><a class="btn btn--line" href="#finder"><span class="lbl">Find my bed</span></a></div>
       </section>
 
@@ -234,7 +235,8 @@
       name: 'shop',
       title: `${C ? C.name : 'All beds'} | Phoenix Beds`,
       html: `<section class="shop"><div class="wrap wrap--wide">
-        <div class="shop-head"><h1 class="shop-title" id="shop-title">${C ? C.name : 'All beds'}</h1><p class="shop-line" id="shop-line" data-hero-after>${C ? C.line : 'Every bed is made to order in our Dewsbury workshop.'}</p></div>
+        <div class="shop-head"><h1 class="shop-title" id="shop-title">${C ? C.name : 'All beds'}</h1><p class="shop-line" id="shop-line" data-hero-after>${C ? C.line : 'Every bed is made to order in our Dewsbury workshop.'}</p>
+        ${S.SOURCES.phoenix ? `<a class="hero-score hero-score--sm" href="#reviews"><span class="sr">Rated ${S.SOURCES.phoenix.rating} out of 5 from ${fmt(S.SOURCES.phoenix.count)} customer reviews.</span>${meter(S.SOURCES.phoenix.rating, ' meter--sm')}<span aria-hidden="true">${S.SOURCES.phoenix.rating.toFixed(1)} · ${fmt(S.SOURCES.phoenix.count)} reviews</span></a>` : ''}</div>
         <figure class="shop-cover shot" id="shop-cover" style="--shot:url('${cover(C)}')"><img src="${cover(C)}"${ss(cover(C), '100vw')} alt=""></figure>
         <div class="filterbar" data-hero-after><nav class="chips" id="chips" aria-label="Bed categories">${chips.map(([id, label]) => `<a href="#shop${id ? '-' + id : ''}" data-cat="${id}" ${(id || '') === (c || '') ? 'aria-current="page"' : ''}>${label}${n(id) ? `<span class="chips__n">${n(id)}</span>` : ''}</a>`).join('')}</nav></div>
         <div class="sortrow"><p class="count-line" id="count-line" aria-live="polite"></p>

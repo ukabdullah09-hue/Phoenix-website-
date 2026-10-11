@@ -1,7 +1,18 @@
 /* Product data: bed names and photos from the supplied catalogue. Prices are placeholders until confirmed. */
 window.STORE = (() => {
+  // ── Reviews ──────────────────────────────────────────────────────────────────────────────────
   // Every review on file recommends us, so the score is 5. The count is the number of reviews we
-  // actually hold, and nothing here may be set by hand.
+  // actually hold.
+  //
+  // A bed only shows stars when a real review names it. To give a bed its own score, put the real
+  // number of reviews for that bed in COUNTS below and the stars appear on it straight away. These
+  // have to be counted from the reviews themselves. Numbers that were not counted from real reviews
+  // are illegal to publish in the UK (Digital Markets, Competition and Consumers Act 2024, banned
+  // practice 13: fake or misleading consumer reviews), so leave a bed out rather than guess at it.
+  const COUNTS = {
+    diva: 3,
+    'axel-sleigh': 1
+  };
   const SOURCES = { phoenix: { rating: 5, count: 46 } };
 
   const SIZES = [
@@ -78,10 +89,10 @@ window.STORE = (() => {
     P({ id: 'neo', name: 'Neo', cat: 'luxury', photos: ["images/beds/neo-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'sunshine', name: 'Sunshine', cat: 'luxury', photos: ["images/beds/sunshine-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'pandora', name: 'Pandora', cat: 'luxury', photos: ["images/beds/pandora-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ rating: 5, count: 3, id: 'diva', name: 'Diva', cat: 'luxury', photos: ["images/beds/diva-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'diva', name: 'Diva', cat: 'luxury', photos: ["images/beds/diva-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'butterfly', name: 'Butterfly', cat: 'luxury', photos: ["images/beds/butterfly-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'eve', name: 'Eve', cat: 'luxury', photos: ["images/beds/eve-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
-    P({ rating: 5, count: 1, id: 'axel-sleigh', name: 'Axel Sleigh', cat: 'luxury', photos: ["images/beds/axel-sleigh-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
+    P({ id: 'axel-sleigh', name: 'Axel Sleigh', cat: 'luxury', photos: ["images/beds/axel-sleigh-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'avalon', name: 'Avalon', cat: 'luxury', photos: ["images/beds/avalon-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'lilly', name: 'Lilly', cat: 'premium', photos: ["images/beds/lilly-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
     P({ id: 'aurora', name: 'Aurora', cat: 'premium', photos: ["images/beds/aurora-1.jpg"], prices: [450, 470, 500, 550, 600], about: 'Made to order in our Dewsbury workshop. Available in every size and add-on.' }),
@@ -179,6 +190,9 @@ window.STORE = (() => {
     const f = FABRICS.find((x) => x.id === fabricId) || FABRICS[0];
     return f.colours.find((c) => c[0] === colourId) || f.colours[0];
   };
+
+  // A bed carries stars only where COUNTS gives it a real, counted number
+  PRODUCTS.forEach((p) => { const n = COUNTS[p.id]; if (n > 0) { p.rating = 5; p.count = n; } });
 
   return { SOURCES, SIZES, CATEGORIES, FABRICS, HEADBOARDS, STORAGE, OTTOMAN_BOX, MATTRESS, DELIVERY, ASSEMBLY, PRODUCTS, REVIEWS, money, product, colourOf };
 })();
