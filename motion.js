@@ -136,76 +136,42 @@ window.Motion = (() => {
     });
     const letters = el.querySelectorAll('.loader__word span i');
     const lockup = [...words, rule, sub];
-    const STRIKE = 2.2, END = 4.1;
-    const beam = el.querySelector('.loader__beam');
-    const stopFx = ash(el.querySelector('.loader__ash'), STRIKE);
-    introSound({ strike: STRIKE });
+    const SHEEN = 1.5, FLY = 3.1, END = 4.55;
+    const warm = el.querySelector('.loader__warm');
+    introSound({ strike: SHEEN });
 
     // The page is held back until the intro hands over to it, so the two cross over instead of cutting
     const page = document.querySelectorAll('#view, .footer');
     const chrome = document.querySelectorAll('.tabbar, .wa');
-    g.set(page, { opacity: 0, scale: 1.035, transformOrigin: '50% 40%' });
+    g.set(page, { opacity: 0, scale: 1.1, transformOrigin: '50% 42%' });
     g.set(chrome, { opacity: 0 });
 
-    g.timeline({ onComplete: () => { stopFx(); el.remove(); } })
-      // A single line of light strikes, widens, and climbs. Everything else answers to it.
-      .fromTo(beam, { opacity: 0, scaleX: 0.06, scaleY: 1 }, { opacity: 1, scaleX: 1, duration: 1.1, ease: 'expo.out' }, 0.25)
-      .fromTo(beam, { top: '66%' }, { top: '34%', duration: 2.5, ease: 'power2.inOut' }, 0.55)
-      // The light lifts the letters out of the dark as it passes through them
-      .fromTo(letters, { yPercent: 118 }, { yPercent: 0, duration: 1.5, ease: 'expo.out', stagger: 0.045 }, STRIKE - 1.05)
-      .fromTo(words[0], { letterSpacing: '0.62em', textIndent: '0.62em' }, { letterSpacing: '0.34em', textIndent: '0.34em', duration: 2.2, ease: 'expo.out' }, STRIKE - 1.05)
-      // Then it thins, cools and settles into the hairline that sits under the name
-      .to(beam, { scaleX: 0.42, duration: 1.1, ease: 'power2.inOut' }, STRIKE - 0.1)
-      .to(beam, { opacity: 0, scaleX: 0.16, top: '24%', duration: 1, ease: 'power2.in' }, STRIKE + 0.35)
-      .fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.5, ease: 'expo.out' }, STRIKE + 0.1)
-      // The glint travels across the name: each letter sweeps its own sheen, a beat after the one before
-      .fromTo(letters, { backgroundPosition: '110% 0' }, { backgroundPosition: '-70% 0', duration: 1.25, ease: 'power2.inOut', stagger: 0.06 }, STRIKE + 0.15)
-      .fromTo(sub, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 1.3, ease: 'power3.out' }, STRIKE + 0.35)
-      // The name drifts back and softens as the page comes forward through it
-      .to(lockup, { opacity: 0, scale: 1.12, filter: 'blur(10px)', duration: 1.15, ease: 'power2.inOut' }, END - 0.35)
-      .to(el.querySelector('.loader__ash'), { opacity: 0, duration: 0.9, ease: 'power2.in' }, END - 0.35)
-      .to(el, { opacity: 0, duration: 1.25, ease: 'power2.inOut' }, END - 0.15)
-      .to(page, { opacity: 1, scale: 1, duration: 1.5, ease: 'expo.out', clearProps: 'transform,opacity' }, END - 0.25)
-      .to(chrome, { opacity: 1, duration: 1, ease: 'power2.out', clearProps: 'opacity' }, END + 0.05);
+    g.timeline({ onComplete: () => el.remove() })
+      // The name simply resolves: no trick, just a long settle from a touch too close and too soft
+      .fromTo(letters, { yPercent: 115 }, { yPercent: 0, duration: 1.5, ease: 'expo.out', stagger: 0.03 }, 0.3)
+      .fromTo(el.querySelector('.loader__inner'), { scale: 1.08, filter: 'blur(7px)' },
+        { scale: 1, filter: 'blur(0px)', duration: 2, ease: 'expo.out' }, 0.3)
+      .fromTo(warm, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 2.4, ease: 'power2.out' }, 0.2)
+      // One pass of light across the metal, and then the rule and the line beneath it
+      .fromTo(letters, { backgroundPosition: '110% 0' }, { backgroundPosition: '-70% 0', duration: 1.3, ease: 'power2.inOut', stagger: 0.05 }, SHEEN)
+      .fromTo(rule, { scaleX: 0 }, { scaleX: 1, duration: 1.4, ease: 'expo.out' }, SHEEN + 0.15)
+      .fromTo(sub, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' }, SHEEN + 0.4)
+      // Then the shop is not cut to, it is arrived at: the name comes at you and you pass through it
+      .to(el.querySelector('.loader__inner'), { scale: 9, opacity: 0, filter: 'blur(9px)', duration: 1.45, ease: 'power2.in' }, FLY)
+      .to(warm, { scale: 2.4, opacity: 0, duration: 1.45, ease: 'power2.in' }, FLY)
+      .to(el, { opacity: 0, duration: 1.05, ease: 'power2.inOut' }, FLY + 0.3)
+      .to(page, { opacity: 1, scale: 1, duration: 1.7, ease: 'expo.out', clearProps: 'transform,opacity' }, FLY + 0.22)
+      .to(chrome, { opacity: 1, duration: 1, ease: 'power2.out', clearProps: 'opacity' }, FLY + 0.65);
 
     // The page is hidden until the intro hands over, so make sure it can never stay hidden
     setTimeout(() => {
       if (!el.isConnected) return;
-      stopFx();
       el.remove();
       g.set([...page, ...chrome], { clearProps: 'transform,opacity' });
-    }, (END + 6) * 1000);
+    }, (END + 5) * 1000);
 
-    heroDelay = END + 0.35;
+    heroDelay = END - 0.2;
     return heroDelay;
-  }
-
-  /* Ash: a dozen flecks lifting on the heat, lit from below. Few, slow and mostly out of focus, so
-     they read as the air above a fire rather than as a screen full of dots. */
-  function ash(box, strike) {
-    if (!box) return () => {};
-    const rnd = (a, z) => a + Math.random() * (z - a);
-    const tweens = [];
-    const n = window.innerWidth < 560 ? 9 : 14;
-    for (let i = 0; i < n; i++) {
-      const el = document.createElement('i');
-      // Depth: the near ones are bigger, softer and dimmer, the far ones small and sharp
-      const z = Math.pow(Math.random(), 1.7);
-      const d = 1.6 + z * 7;
-      const heat = rnd(0, 1);
-      el.style.width = el.style.height = d.toFixed(1) + 'px';
-      el.style.left = rnd(18, 82).toFixed(1) + '%';
-      el.style.background = `radial-gradient(circle, rgba(255,${(226 - heat * 70).toFixed(0)},${(188 - heat * 130).toFixed(0)},1), rgba(${(228 - heat * 40).toFixed(0)},${(104 - heat * 40).toFixed(0)},40,0) 70%)`;
-      if (z > 0.45) el.style.filter = `blur(${(z * 2.6).toFixed(1)}px)`;
-      box.appendChild(el);
-      const dur = rnd(7, 13) * (1.25 - z * 0.45);
-      tweens.push(g.fromTo(el,
-        { yPercent: 0, y: '102vh', opacity: 0 },
-        { y: '-12vh', opacity: 0.18 + (1 - z) * 0.5, duration: dur, ease: 'none', delay: strike * 0.15 + i * rnd(0.3, 0.8), repeat: -1,
-          repeatRefresh: true, keyframes: undefined }));
-      tweens.push(g.to(el, { xPercent: rnd(-220, 220), duration: rnd(5, 9), ease: 'sine.inOut', yoyo: true, repeat: -1, delay: i * 0.4 }));
-    }
-    return () => tweens.forEach((t) => t.kill());
   }
 
   function intro() {

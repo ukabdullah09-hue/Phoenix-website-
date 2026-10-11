@@ -41,16 +41,9 @@ h1, h2, h3 { font-weight: 600; letter-spacing: -0.015em; line-height: 1.07; text
 
 /* ── First-load intro and scroll progress ── */
 .loader { position: fixed; inset: 0; z-index: 100; background: #000; display: grid; place-items: center; animation: loaderAuto 0.5s 2.7s forwards; }
-/* The ignition: one line of light that rises and lifts the name out of the dark with it */
-.loader__beam { position: absolute; left: 50%; top: 64%; z-index: 0; width: min(78vw, 560px); height: 1px; translate: -50% 0; opacity: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 186, 116, .9) 16%, #fff4e4 50%, rgba(255, 186, 116, .9) 84%, transparent); }
-.loader__beam::before { content: ""; position: absolute; left: 50%; top: 50%; width: 190%; height: clamp(84px, 20vw, 150px); translate: -50% -50%; pointer-events: none;
-  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 150, 62, .34), rgba(206, 58, 16, .1) 46%, transparent 74%); filter: blur(12px); }
-.loader__beam::after { content: ""; position: absolute; left: 50%; top: 50%; width: 70%; height: clamp(26px, 6vw, 44px); translate: -50% -50%; pointer-events: none;
-  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 232, 200, .42), transparent 72%); filter: blur(5px); }
-/* What the fire leaves behind: a few flecks of ash, lit from below, too slow to draw the eye */
-.loader__ash { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-.loader__ash i { position: absolute; border-radius: 50%; opacity: 0; will-change: transform; }
+/* The warmth behind the name: a slow, soft rise of heat, never a shape you can point at */
+.loader__warm { position: absolute; left: 50%; top: 50%; z-index: 0; width: min(150vw, 1100px); aspect-ratio: 1 / 0.62; translate: -50% -50%; pointer-events: none; opacity: 0;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(255, 152, 72, .2), rgba(190, 56, 18, .07) 44%, transparent 72%); }
 .loader__inner { position: relative; display: grid; justify-items: center; gap: 0; padding-inline: 1.5rem; text-align: center; }
 /* The name reads as a lockup: wide caps, a hairline, then the second word and the line beneath */
 .loader__word { position: relative; display: flex; font-size: clamp(1.45rem, 6.4vw, 2.6rem); font-weight: 500; text-transform: uppercase; letter-spacing: 0.34em; text-indent: 0.34em; line-height: 1.1; color: #f4f1ec; }
